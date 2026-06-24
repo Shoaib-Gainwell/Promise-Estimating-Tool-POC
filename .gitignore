@@ -1,0 +1,30 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.dll
+*.exe
+*.pdb
+
+## SQLite
+*.db
+*.db-shm
+*.db-wal
+
+## Visual Studio
+.vs/
+*.rsuser
+*.userprefs
+
+## Rider
+.idea/
+
+## OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+## LLM bridge (local tooling)
+llm-bridge/
