@@ -170,9 +170,9 @@ public class ViewModelEdgeCaseTests
         Assert.Equal(0m, vm.BaSystemDocHours);
         Assert.Equal(0m, vm.ProductionValidationHours);
         Assert.Equal(0m, vm.ProjectManagementHours);
-        // Default collaboration items contribute 93.75 hrs (matching Excel defaults)
-        Assert.Equal(93.75m, vm.TotalCollaborationHours);
-        Assert.Equal("Small", vm.TShirtSize);
+        // No default collaboration items
+        Assert.Equal(0m, vm.TotalCollaborationHours);
+        Assert.Equal("—", vm.TShirtSize);
     }
 
     [Fact]
@@ -357,9 +357,9 @@ public class ViewModelEdgeCaseTests
         vm.Components[0].Size = ComponentSize.Large;
         vm.Components[0].ChangeType = ChangeType.New;
 
-        // Grand Total = Subtotal + PM Reserve
+        // Grand Total = Math.Ceiling(Subtotal + PM Reserve)
         // Subtotal includes Dev + Derived + PM Effort + Collaboration + Adjusted
-        Assert.Equal(vm.SubtotalHours + vm.PmReserveHours, vm.GrandTotalHours);
+        Assert.Equal(Math.Ceiling(vm.SubtotalHours + vm.PmReserveHours), vm.GrandTotalHours);
     }
 
     [Fact]

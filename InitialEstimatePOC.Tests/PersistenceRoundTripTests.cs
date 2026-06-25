@@ -334,7 +334,9 @@ public class PersistenceRoundTripTests
     public void LoadProject_ClearsPreviousCollaboration()
     {
         var vm = CreateVm();
-        Assert.Equal(5, vm.CollaborationItems.Count); // defaults
+        vm.AddCollaborationItemCommand.Execute(null);
+        vm.AddCollaborationItemCommand.Execute(null);
+        Assert.Equal(2, vm.CollaborationItems.Count);
 
         var entity = new ProjectEntity
         {

@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using InitialEstimatePOC.Data;
 using InitialEstimatePOC.Models;
@@ -35,6 +36,9 @@ public partial class MainViewModel : ObservableObject
 
     // Tracks the loaded project's ID (null = new unsaved project)
     private string? _currentProjectId;
+
+    // Suppresses intermediate Recalculate calls during ClearAll
+    private bool _suppressRecalculate;
 
     // === Calculated: Development & Derived Tasks ===
     [ObservableProperty]
@@ -218,7 +222,6 @@ public partial class MainViewModel : ObservableObject
     {
         Components.CollectionChanged += (_, _) => Recalculate();
         CollaborationItems.CollectionChanged += (_, _) => Recalculate();
-        InitializeDefaultCollaborationItems();
     }
 
     /// <summary>
@@ -262,6 +265,7 @@ public partial class MainViewModel : ObservableObject
         {
             LineNumber = Components.Count + 1
         };
+        row.UpdateBaseHours();
         row.PropertyChanged += OnComponentChanged;
         Components.Add(row);
         Recalculate();
@@ -281,12 +285,58 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void ClearAll()
     {
+        _suppressRecalculate = true;
+
         foreach (var c in Components)
             c.PropertyChanged -= OnComponentChanged;
         Components.Clear();
         foreach (var item in CollaborationItems)
             item.PropertyChanged -= OnCollaborationChanged;
         CollaborationItems.Clear();
+
+        // Reset header fields
+        ProjectName = string.Empty;
+        ChangeOrderId = string.Empty;
+        ProjectDescription = string.Empty;
+        EstimatedBy = string.Empty;
+        ReviewedBy = string.Empty;
+        _currentProjectId = null;
+
+        // Reset PM configuration to defaults
+        PmEffortPercentage = 15m;
+        PmReservePercentage = 5m;
+
+        // Reset adjusted hours
+        DevelopmentAdjustedHours = 0m;
+        AnalysisAdjustedHours = 0m;
+        BusinessDesignAdjustedHours = 0m;
+        SystemTestingAdjustedHours = 0m;
+        PromotionAdjustedHours = 0m;
+        BaSystemDocAdjustedHours = 0m;
+        ProductionValidationAdjustedHours = 0m;
+        ProjectManagementAdjustedHours = 0m;
+        CollaborationAdjustedHours = 0m;
+        AdjustedHoursComments = string.Empty;
+
+        // Reset assumptions
+        SeAssumptions = string.Empty;
+        BaAssumptions = string.Empty;
+        CollaborationAssumptions = string.Empty;
+        GeneralAssumptions = string.Empty;
+
+        // Reset test case estimation
+        UseTestCasesForEstimate = false;
+        TestCasesSimple = 0;
+        TestCasesMedium = 0;
+        TestCasesComplex = 0;
+        TestCasesVeryComplex = 0;
+        TestCaseIterations = 1;
+
+        // Reset actual hours
+        TotalActualHours = 0m;
+        TimeForEstimates = 0m;
+
+        _suppressRecalculate = false;
         Recalculate();
     }
 
@@ -366,6 +416,7 @@ public partial class MainViewModel : ObservableObject
     // === Core Calculation Engine (matches Excel exactly) ===
     private void Recalculate()
     {
+        if (_suppressRecalculate) return;
         // Step 1: Development = sum of all component hours
         decimal dev = 0m;
         foreach (var c in Components)
@@ -375,10 +426,16 @@ public partial class MainViewModel : ObservableObject
         ComponentCount = Components.Count;
         CollaborationCount = CollaborationItems.Count;
 
-        // Step 2: System Testing
+        // All adjustments cascade: each task uses effective (calculated + adjusted) values
+        // from upstream tasks for its own calculation.
+
+        // Effective Development = component hours + adjustment
+        decimal effectiveDev = dev + DevelopmentAdjustedHours;
+        TotalDevelopmentHours = effectiveDev;
+
+        // Step 2: System Testing (depends on effectiveDev)
         if (UseTestCasesForEstimate)
         {
-            // Test case-based: Simple=0.5h, Medium=1h, Complex=2h, VeryComplex=4h per test case per iteration
             decimal testHours = (TestCasesSimple * 0.5m + TestCasesMedium * 1.0m 
                                + TestCasesComplex * 2.0m + TestCasesVeryComplex * 4.0m) 
                                * Math.Max(1, TestCaseIterations);
@@ -386,79 +443,94 @@ public partial class MainViewModel : ObservableObject
         }
         else
         {
-            // Default: ROUNDUP(Dev * 30%, 2)
-            SystemTestingHours = RoundUp(dev * 0.30m);
+            SystemTestingHours = RoundUp(effectiveDev * 0.30m);
         }
+        decimal effectiveSysTest = SystemTestingHours + SystemTestingAdjustedHours;
 
-        // Step 3: Analysis = ROUNDUP((Dev + SysTest) * 5%, 2)
-        AnalysisHours = RoundUp((dev + SystemTestingHours) * 0.05m);
+        // Step 3: Analysis (depends on effectiveDev + effectiveSysTest)
+        AnalysisHours = RoundUp((effectiveDev + effectiveSysTest) * 0.05m);
+        decimal effectiveAnalysis = AnalysisHours + AnalysisAdjustedHours;
 
-        // Step 4: Business Design = ROUNDUP((Dev + SysTest) * 15%, 2)
-        BusinessDesignHours = RoundUp((dev + SystemTestingHours) * 0.15m);
+        // Step 4: Business Design (depends on effectiveDev + effectiveSysTest)
+        BusinessDesignHours = RoundUp((effectiveDev + effectiveSysTest) * 0.15m);
+        decimal effectiveBizDesign = BusinessDesignHours + BusinessDesignAdjustedHours;
 
-        // Step 5: Promotion = ROUNDUP(Dev * 5%, 2)
-        PromotionHours = RoundUp(dev * 0.05m);
+        // Step 5: Promotion (depends on effectiveDev)
+        PromotionHours = RoundUp(effectiveDev * 0.05m);
+        decimal effectivePromotion = PromotionHours + PromotionAdjustedHours;
 
-        // Step 6: BA System Documentation = ROUNDUP(Dev * 5%, 2)
-        BaSystemDocHours = RoundUp(dev * 0.05m);
+        // Step 6: BA System Documentation (depends on effectiveDev)
+        BaSystemDocHours = RoundUp(effectiveDev * 0.05m);
+        decimal effectiveBaSysDoc = BaSystemDocHours + BaSystemDocAdjustedHours;
 
-        // Step 7: Production Validation = ROUNDUP(SysTest * 20%, 2)
-        ProductionValidationHours = RoundUp(SystemTestingHours * 0.20m);
+        // Step 7: Production Validation (depends on effectiveSysTest)
+        ProductionValidationHours = RoundUp(effectiveSysTest * 0.20m);
+        decimal effectiveProdVal = ProductionValidationHours + ProductionValidationAdjustedHours;
 
-        // Step 8: PM Effort = ROUNDUP(Sum(Dev + all derived) * PM%, 2)
-        decimal devPlusDerived = dev + SystemTestingHours + AnalysisHours + BusinessDesignHours
-                                + PromotionHours + BaSystemDocHours + ProductionValidationHours;
-        ProjectManagementHours = RoundUp(devPlusDerived * (PmEffortPercentage / 100m));
+        // Step 8: PM Effort (depends on all effective task hours)
+        decimal allEffectiveTasks = effectiveDev + effectiveSysTest + effectiveAnalysis + effectiveBizDesign
+                                  + effectivePromotion + effectiveBaSysDoc + effectiveProdVal;
+        ProjectManagementHours = RoundUp(allEffectiveTasks * (PmEffortPercentage / 100m));
+        decimal effectivePM = ProjectManagementHours + ProjectManagementAdjustedHours;
 
         // Step 9: Collaboration = sum of all collaboration items
         decimal collab = 0m;
         foreach (var item in CollaborationItems)
             collab += item.TotalHours;
         TotalCollaborationHours = collab;
+        decimal effectiveCollab = collab + CollaborationAdjustedHours;
 
-        // Per-task totals (Calculated + Adjusted)
-        DevelopmentTotalHours = dev + DevelopmentAdjustedHours;
-        AnalysisTotalHours = AnalysisHours + AnalysisAdjustedHours;
-        BusinessDesignTotalHours = BusinessDesignHours + BusinessDesignAdjustedHours;
-        SystemTestingTotalHours = SystemTestingHours + SystemTestingAdjustedHours;
-        PromotionTotalHours = PromotionHours + PromotionAdjustedHours;
-        BaSystemDocTotalHours = BaSystemDocHours + BaSystemDocAdjustedHours;
-        ProductionValidationTotalHours = ProductionValidationHours + ProductionValidationAdjustedHours;
-        ProjectManagementTotalHours = ProjectManagementHours + ProjectManagementAdjustedHours;
-        CollaborationTotalHours = collab + CollaborationAdjustedHours;
+        // Per-task totals (effective = calculated + adjusted, shown in UI)
+        DevelopmentTotalHours = effectiveDev;
+        SystemTestingTotalHours = effectiveSysTest;
+        AnalysisTotalHours = effectiveAnalysis;
+        BusinessDesignTotalHours = effectiveBizDesign;
+        PromotionTotalHours = effectivePromotion;
+        BaSystemDocTotalHours = effectiveBaSysDoc;
+        ProductionValidationTotalHours = effectiveProdVal;
+        ProjectManagementTotalHours = effectivePM;
+        CollaborationTotalHours = effectiveCollab;
 
-        // Step 10: Subtotal = sum of all task totals (calculated + adjusted) + Time for Estimates + Actual Hours
-        decimal totalAdjustments = DevelopmentAdjustedHours + AnalysisAdjustedHours + BusinessDesignAdjustedHours
-                                 + SystemTestingAdjustedHours + PromotionAdjustedHours + BaSystemDocAdjustedHours
-                                 + ProductionValidationAdjustedHours + ProjectManagementAdjustedHours + CollaborationAdjustedHours;
-        SubtotalHours = devPlusDerived + ProjectManagementHours + collab + totalAdjustments
-                       + TimeForEstimates + TotalActualHours;
+        // Step 10: Subtotal = sum of all effective task totals + Time for Estimates + Actual Hours
+        SubtotalHours = effectiveDev + effectiveSysTest + effectiveAnalysis + effectiveBizDesign
+                      + effectivePromotion + effectiveBaSysDoc + effectiveProdVal
+                      + effectivePM + effectiveCollab + TimeForEstimates + TotalActualHours;
 
-        // Step 11: PM Reserve = ROUNDUP(Subtotal * Reserve%, 2)
-        PmReserveHours = RoundUp(SubtotalHours * (PmReservePercentage / 100m));
+        // When no components and no adjusted dev hours exist, don't show totals in summary
+        if (ComponentCount == 0 && effectiveDev == 0m)
+        {
+            PmReserveHours = 0m;
+            GrandTotalHours = 0m;
+            TShirtSize = "—";
+        }
+        else
+        {
+            // Step 11: PM Reserve = ROUNDUP(Subtotal * Reserve%, 2)
+            PmReserveHours = RoundUp(SubtotalHours * (PmReservePercentage / 100m));
 
-        // Step 12: Grand Total = Subtotal + PM Reserve
-        GrandTotalHours = SubtotalHours + PmReserveHours;
+            // Step 12: Grand Total = Subtotal + PM Reserve, rounded up to whole number
+            GrandTotalHours = Math.Ceiling(SubtotalHours + PmReserveHours);
 
-        // T-Shirt Size
-        TShirtSize = WeightedValues.GetTShirtSize(GrandTotalHours);
+            // T-Shirt Size
+            TShirtSize = WeightedValues.GetTShirtSize(GrandTotalHours);
+        }
 
-        // === Role Breakout (Excel rows 47-51) ===
+        // === Role Breakout (uses effective values) ===
         // BA = Analysis/2 + BusinessDesign + BADoc + ProdValidation + PM/2
-        BaRoleHours = RoundUp(AnalysisHours / 2m + BusinessDesignHours + BaSystemDocHours
-                     + ProductionValidationHours + ProjectManagementHours / 2m);
+        BaRoleHours = RoundUp(effectiveAnalysis / 2m + effectiveBizDesign + effectiveBaSysDoc
+                     + effectiveProdVal + effectivePM / 2m);
 
         // SE = Development + Analysis/2 + Promotion + PM/2
-        SeRoleHours = RoundUp(dev + AnalysisHours / 2m + PromotionHours + ProjectManagementHours / 2m);
+        SeRoleHours = RoundUp(effectiveDev + effectiveAnalysis / 2m + effectivePromotion + effectivePM / 2m);
 
-        // Tester = System Testing
-        TesterRoleHours = SystemTestingHours;
+        // Tester = System Testing (effective)
+        TesterRoleHours = effectiveSysTest;
 
-        // PM = PM Effort
-        PmRoleHours = ProjectManagementHours;
+        // PM = PM Effort (effective)
+        PmRoleHours = effectivePM;
 
-        // Collaboration = Collaboration total
-        CollaborationRoleHours = TotalCollaborationHours;
+        // Collaboration = Collaboration total (effective)
+        CollaborationRoleHours = effectiveCollab;
     }
 
     /// <summary>
@@ -483,7 +555,8 @@ public partial class MainViewModel : ObservableObject
             return "Project Name is required.";
 
         using var db = new EstimateDbContext();
-        db.Database.EnsureCreated();
+        try { db.Database.EnsureCreated(); }
+        catch (SqliteException ex) when (ex.SqliteErrorCode == 1 && ex.Message.Contains("already exists")) { }
 
         ProjectEntity? existing = null;
         if (_currentProjectId != null)
@@ -722,7 +795,8 @@ public partial class MainViewModel : ObservableObject
     public static List<ProjectEntity> GetAllProjects()
     {
         using var db = new EstimateDbContext();
-        db.Database.EnsureCreated();
+        try { db.Database.EnsureCreated(); }
+        catch (SqliteException ex) when (ex.SqliteErrorCode == 1 && ex.Message.Contains("already exists")) { }
         return db.Projects.Include(p => p.Components).Include(p => p.CollaborationItems)
                  .OrderByDescending(p => p.LastModifiedDate)
                  .ToList();

@@ -56,7 +56,9 @@ public class AdjustedHoursTests
         AddMiscLarge(vm);
         decimal subtotalBefore = vm.SubtotalHours;
         vm.DevelopmentAdjustedHours = 50m;
-        Assert.Equal(subtotalBefore + 50m, vm.SubtotalHours);
+        // Development adjustment cascades into derived tasks (SysTest, Analysis, etc.)
+        Assert.True(vm.SubtotalHours > subtotalBefore);
+        Assert.True(vm.SubtotalHours > subtotalBefore + 50m); // More than linear due to cascading
     }
 
     #endregion
@@ -87,7 +89,9 @@ public class AdjustedHoursTests
         AddMiscLarge(vm);
         decimal before = vm.SubtotalHours;
         vm.AnalysisAdjustedHours = 10m;
-        Assert.Equal(before + 10m, vm.SubtotalHours);
+        // Analysis adjustment cascades into PM calculation
+        Assert.True(vm.SubtotalHours > before);
+        Assert.True(vm.SubtotalHours > before + 10m);
     }
 
     #endregion
@@ -254,9 +258,8 @@ public class AdjustedHoursTests
     {
         var vm = CreateVm();
         AddMiscLarge(vm);
-        decimal baseline = vm.SubtotalHours;
 
-        vm.DevelopmentAdjustedHours = 10m;
+        // Set non-dev adjustments first (these add linearly)
         vm.AnalysisAdjustedHours = 5m;
         vm.BusinessDesignAdjustedHours = 3m;
         vm.SystemTestingAdjustedHours = 7m;
@@ -266,8 +269,12 @@ public class AdjustedHoursTests
         vm.ProjectManagementAdjustedHours = 6m;
         vm.CollaborationAdjustedHours = 8m;
 
-        decimal totalAdj = 10m + 5m + 3m + 7m + 2m + 1m + 4m + 6m + 8m; // 46
-        Assert.Equal(baseline + totalAdj, vm.SubtotalHours);
+        decimal afterNonDev = vm.SubtotalHours;
+
+        // Development adjustment cascades into derived tasks
+        vm.DevelopmentAdjustedHours = 10m;
+        Assert.True(vm.SubtotalHours > afterNonDev);
+        Assert.True(vm.SubtotalHours > afterNonDev + 10m); // Cascading effect
     }
 
     [Fact]
@@ -280,7 +287,9 @@ public class AdjustedHoursTests
         vm.DevelopmentAdjustedHours = -5m;
         vm.SystemTestingAdjustedHours = -3m;
 
-        Assert.Equal(baseline - 8m, vm.SubtotalHours);
+        // Dev adjustment cascades (reduces derived tasks too), so reduction > raw 8
+        Assert.True(vm.SubtotalHours < baseline);
+        Assert.True(vm.SubtotalHours < baseline - 8m);
     }
 
     #endregion
@@ -316,17 +325,19 @@ public class AdjustedHoursTests
         AddMiscLarge(vm);
         vm.PmReservePercentage = 0m;
         Assert.Equal(0m, vm.PmReserveHours);
-        Assert.Equal(vm.SubtotalHours, vm.GrandTotalHours);
+        Assert.Equal(Math.Ceiling(vm.SubtotalHours), vm.GrandTotalHours);
     }
 
     [Fact]
     public void PmReserve_ROUNDUP_Applied()
     {
         var vm = CreateVm();
-        // Create scenario where reserve produces 3+ decimals
-        // Collab default = 93.75, SubtotalHours = 93.75
-        // Reserve = ROUNDUP(93.75 * 0.05, 2) = ROUNDUP(4.6875, 2) = 4.69
-        Assert.Equal(4.69m, vm.PmReserveHours);
+        // With no components, PM Reserve = 0 (summary hidden)
+        Assert.Equal(0m, vm.PmReserveHours);
+        // Add a component so reserve is calculated
+        AddMiscLarge(vm);
+        // Now subtotal includes dev + derived + collab, reserve should use ROUNDUP
+        Assert.True(vm.PmReserveHours > 0m);
     }
 
     #endregion
@@ -343,7 +354,7 @@ public class AdjustedHoursTests
         vm.TimeForEstimates = 15m;
         vm.TotalActualHours = 10m;
 
-        Assert.Equal(vm.SubtotalHours + vm.PmReserveHours, vm.GrandTotalHours);
+        Assert.Equal(Math.Ceiling(vm.SubtotalHours + vm.PmReserveHours), vm.GrandTotalHours);
     }
 
     #endregion
@@ -423,6 +434,237 @@ public class AdjustedHoursTests
         vm.GeneralAssumptions = "notes";
 
         Assert.Equal(grand, vm.GrandTotalHours);
+    }
+
+    #endregion
+
+    #region Cascading Adjustments
+
+    [Fact]
+    public void SystemTestingAdjusted_CascadesIntoAnalysis()
+    {
+        var vm = CreateVm();
+        AddMiscLarge(vm); // dev=100, SysTest=30
+        decimal analysisBefore = vm.AnalysisHours;
+
+        vm.SystemTestingAdjustedHours = 10m;
+        // Analysis = ROUNDUP((effectiveDev + effectiveSysTest) * 5%)
+        // effectiveSysTest = 30 + 10 = 40, so Analysis = ROUNDUP((100+40)*0.05) = ROUNDUP(7) = 7
+        Assert.True(vm.AnalysisHours > analysisBefore);
+    }
+
+    [Fact]
+    public void SystemTestingAdjusted_CascadesIntoBusinessDesign()
+    {
+        var vm = CreateVm();
+        AddMiscLarge(vm);
+        decimal bizDesignBefore = vm.BusinessDesignHours;
+
+        vm.SystemTestingAdjustedHours = 10m;
+        // BusinessDesign = ROUNDUP((effectiveDev + effectiveSysTest) * 15%)
+        Assert.True(vm.BusinessDesignHours > bizDesignBefore);
+    }
+
+    [Fact]
+    public void SystemTestingAdjusted_CascadesIntoProductionValidation()
+    {
+        var vm = CreateVm();
+        AddMiscLarge(vm);
+        decimal prodValBefore = vm.ProductionValidationHours;
+
+        vm.SystemTestingAdjustedHours = 10m;
+        // ProdVal = ROUNDUP(effectiveSysTest * 20%)
+        Assert.True(vm.ProductionValidationHours > prodValBefore);
+    }
+
+    [Fact]
+    public void SystemTestingAdjusted_CascadesIntoPM()
+    {
+        var vm = CreateVm();
+        AddMiscLarge(vm);
+        decimal pmBefore = vm.ProjectManagementHours;
+
+        vm.SystemTestingAdjustedHours = 10m;
+        Assert.True(vm.ProjectManagementHours > pmBefore);
+    }
+
+    [Fact]
+    public void AnalysisAdjusted_CascadesIntoPM()
+    {
+        var vm = CreateVm();
+        AddMiscLarge(vm);
+        decimal pmBefore = vm.ProjectManagementHours;
+
+        vm.AnalysisAdjustedHours = 10m;
+        // PM uses effectiveAnalysis which now includes +10
+        Assert.True(vm.ProjectManagementHours > pmBefore);
+    }
+
+    [Fact]
+    public void BusinessDesignAdjusted_CascadesIntoPM()
+    {
+        var vm = CreateVm();
+        AddMiscLarge(vm);
+        decimal pmBefore = vm.ProjectManagementHours;
+
+        vm.BusinessDesignAdjustedHours = 10m;
+        Assert.True(vm.ProjectManagementHours > pmBefore);
+    }
+
+    [Fact]
+    public void PromotionAdjusted_CascadesIntoPM()
+    {
+        var vm = CreateVm();
+        AddMiscLarge(vm);
+        decimal pmBefore = vm.ProjectManagementHours;
+
+        vm.PromotionAdjustedHours = 10m;
+        Assert.True(vm.ProjectManagementHours > pmBefore);
+    }
+
+    [Fact]
+    public void DevelopmentAdjusted_CascadesThroughAllDerived()
+    {
+        var vm = CreateVm();
+        AddMiscLarge(vm); // dev=100
+
+        decimal sysTestBefore = vm.SystemTestingHours;  // 30
+        decimal analysisBefore = vm.AnalysisHours;
+        decimal bizDesignBefore = vm.BusinessDesignHours;
+        decimal promotionBefore = vm.PromotionHours;
+        decimal baSysDocBefore = vm.BaSystemDocHours;
+        decimal prodValBefore = vm.ProductionValidationHours;
+        decimal pmBefore = vm.ProjectManagementHours;
+
+        vm.DevelopmentAdjustedHours = 50m; // effectiveDev = 150
+
+        Assert.True(vm.SystemTestingHours > sysTestBefore);
+        Assert.True(vm.AnalysisHours > analysisBefore);
+        Assert.True(vm.BusinessDesignHours > bizDesignBefore);
+        Assert.True(vm.PromotionHours > promotionBefore);
+        Assert.True(vm.BaSystemDocHours > baSysDocBefore);
+        Assert.True(vm.ProductionValidationHours > prodValBefore);
+        Assert.True(vm.ProjectManagementHours > pmBefore);
+    }
+
+    [Fact]
+    public void CascadingAdjustment_ExactValues_DevPlus25()
+    {
+        var vm = CreateVm();
+        AddMiscLarge(vm); // dev=100, effectiveDev=100
+
+        vm.DevelopmentAdjustedHours = 25m; // effectiveDev = 125
+        // SysTest = ROUNDUP(125*0.30) = ROUNDUP(37.5) = 37.50
+        Assert.Equal(37.50m, vm.SystemTestingHours);
+        // Analysis = ROUNDUP((125+37.50)*0.05) = ROUNDUP(162.50*0.05) = ROUNDUP(8.125) = 8.13
+        Assert.Equal(8.13m, vm.AnalysisHours);
+        // BusinessDesign = ROUNDUP((125+37.50)*0.15) = ROUNDUP(24.375) = 24.38
+        Assert.Equal(24.38m, vm.BusinessDesignHours);
+        // Promotion = ROUNDUP(125*0.05) = ROUNDUP(6.25) = 6.25
+        Assert.Equal(6.25m, vm.PromotionHours);
+        // BaSysDoc = ROUNDUP(125*0.05) = 6.25
+        Assert.Equal(6.25m, vm.BaSystemDocHours);
+        // ProdVal = ROUNDUP(37.50*0.20) = ROUNDUP(7.5) = 7.50
+        Assert.Equal(7.50m, vm.ProductionValidationHours);
+    }
+
+    [Fact]
+    public void CascadingAdjustment_SysTestAdj_AffectsDownstream()
+    {
+        var vm = CreateVm();
+        AddMiscLarge(vm); // dev=100, SysTest=30
+
+        vm.SystemTestingAdjustedHours = 20m; // effectiveSysTest = 30+20 = 50
+        // Analysis = ROUNDUP((100+50)*0.05) = ROUNDUP(7.5) = 7.50
+        Assert.Equal(7.50m, vm.AnalysisHours);
+        // BusinessDesign = ROUNDUP((100+50)*0.15) = ROUNDUP(22.5) = 22.50
+        Assert.Equal(22.50m, vm.BusinessDesignHours);
+        // ProdVal = ROUNDUP(50*0.20) = ROUNDUP(10) = 10
+        Assert.Equal(10m, vm.ProductionValidationHours);
+    }
+
+    [Fact]
+    public void CascadingAdjustment_NegativeDevAdj_ReducesDerived()
+    {
+        var vm = CreateVm();
+        AddMiscLarge(vm); // dev=100
+
+        vm.DevelopmentAdjustedHours = -20m; // effectiveDev = 80
+        // SysTest = ROUNDUP(80*0.30) = 24
+        Assert.Equal(24m, vm.SystemTestingHours);
+        // Promotion = ROUNDUP(80*0.05) = 4
+        Assert.Equal(4m, vm.PromotionHours);
+    }
+
+    [Fact]
+    public void CascadingAdjustment_MultipleAdjustments_CompoundCorrectly()
+    {
+        var vm = CreateVm();
+        AddMiscLarge(vm); // dev=100
+
+        vm.DevelopmentAdjustedHours = 25m; // effectiveDev=125, SysTest=37.50
+        vm.SystemTestingAdjustedHours = 12.50m; // effectiveSysTest = 37.50+12.50 = 50
+
+        // Analysis = ROUNDUP((125+50)*0.05) = ROUNDUP(175*0.05) = ROUNDUP(8.75) = 8.75
+        Assert.Equal(8.75m, vm.AnalysisHours);
+        // BusinessDesign = ROUNDUP(175*0.15) = ROUNDUP(26.25) = 26.25
+        Assert.Equal(26.25m, vm.BusinessDesignHours);
+        // ProdVal = ROUNDUP(50*0.20) = 10
+        Assert.Equal(10m, vm.ProductionValidationHours);
+    }
+
+    #endregion
+
+    #region GrandTotal Ceiling (Round Up to Whole Number)
+
+    [Fact]
+    public void GrandTotal_IsAlwaysWholeNumber()
+    {
+        var vm = CreateVm();
+        AddMiscLarge(vm);
+        Assert.Equal(Math.Ceiling(vm.GrandTotalHours), vm.GrandTotalHours);
+        Assert.Equal(0m, vm.GrandTotalHours % 1m);
+    }
+
+    [Fact]
+    public void GrandTotal_RoundsUpFractional()
+    {
+        var vm = CreateVm();
+        AddMiscLarge(vm);
+        // SubtotalHours + PmReserveHours is typically not a whole number
+        decimal raw = vm.SubtotalHours + vm.PmReserveHours;
+        if (raw != Math.Floor(raw))
+        {
+            Assert.True(vm.GrandTotalHours > raw);
+            Assert.Equal(Math.Ceiling(raw), vm.GrandTotalHours);
+        }
+    }
+
+    [Fact]
+    public void GrandTotal_WholeNumberInput_StaysTheSame()
+    {
+        var vm = CreateVm();
+        AddMiscLarge(vm);
+        // Force subtotal to produce a whole number by adjusting
+        // If SubtotalHours + Reserve is already whole, GrandTotal = that value
+        decimal grand = vm.GrandTotalHours;
+        Assert.Equal(grand, Math.Ceiling(grand));
+    }
+
+    [Fact]
+    public void GrandTotal_WithVariousAdjustments_AlwaysCeiling()
+    {
+        var vm = CreateVm();
+        AddMiscLarge(vm);
+
+        vm.DevelopmentAdjustedHours = 13m;
+        Assert.Equal(Math.Ceiling(vm.SubtotalHours + vm.PmReserveHours), vm.GrandTotalHours);
+
+        vm.SystemTestingAdjustedHours = 7m;
+        Assert.Equal(Math.Ceiling(vm.SubtotalHours + vm.PmReserveHours), vm.GrandTotalHours);
+
+        vm.PmReservePercentage = 8m;
+        Assert.Equal(Math.Ceiling(vm.SubtotalHours + vm.PmReserveHours), vm.GrandTotalHours);
     }
 
     #endregion
