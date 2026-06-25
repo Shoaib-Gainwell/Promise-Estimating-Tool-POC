@@ -254,16 +254,16 @@ public class RoundUpAndTShirtTests
     [Fact]
     public void TShirtSize_EmptyProject_WithCollaboration_Small()
     {
-        // Only default collaboration (93.75) → PM reserve → still < 100
+        // No components → T-shirt shows "—" regardless of collaboration
         var vm = new MainViewModel();
-        Assert.Equal("Small", vm.TShirtSize);
+        Assert.Equal("—", vm.TShirtSize);
     }
 
     [Fact]
     public void TShirtSize_UpdatesWhenComponentsChange()
     {
         var vm = new MainViewModel();
-        Assert.Equal("Small", vm.TShirtSize);
+        Assert.Equal("—", vm.TShirtSize);
 
         vm.AddComponentCommand.Execute(null);
         vm.Components[0].ComponentType = ComponentType.ProgramsDBStoredProcs;

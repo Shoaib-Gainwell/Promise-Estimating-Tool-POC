@@ -139,8 +139,8 @@ public class FullCalculationPipelineTests
         // PM Reserve = ROUNDUP(1885.27 × 0.05, 2) = ROUNDUP(94.2635, 2) = 94.27
         Assert.Equal(MainViewModel.RoundUp(expectedSubtotal * 0.05m), vm.PmReserveHours);
 
-        // Grand Total = 1885.27 + 94.27 = 1979.54
-        Assert.Equal(expectedSubtotal + vm.PmReserveHours, vm.GrandTotalHours);
+        // Grand Total = Math.Ceiling(1885.27 + 94.27) = 1980
+        Assert.Equal(Math.Ceiling(expectedSubtotal + vm.PmReserveHours), vm.GrandTotalHours);
 
         // T-Shirt = XL1 (1000-1999)
         Assert.Equal("XL1", vm.TShirtSize);
@@ -333,13 +333,26 @@ public class FullCalculationPipelineTests
         vm.TimeForEstimates = 20m;
         vm.TotalActualHours = 5m;
 
-        // devPlusDerived = 100+30+6.50+19.50+5+5+6 = 172
-        // PM = ROUNDUP(172 * 0.15, 2) = 25.80
-        // Collab = 0 (cleared)
-        // Subtotal = devPlusDerived(172) + PM(25.80) + collab(0) + adjustments(10) + timeEst(20) + actual(5) = 232.80
-        decimal devPlusDerived = 100m + 30m + 6.50m + 19.50m + 5m + 5m + 6m;
+        // effectiveDev = 100 + 10 = 110 (dev adjustment cascades into derived tasks)
+        // SysTest = ROUNDUP(110*0.30) = 33
+        // Analysis = ROUNDUP(143*0.05) = 7.15
+        // BizDesign = ROUNDUP(143*0.15) = 21.45
+        // Promotion = ROUNDUP(110*0.05) = 5.50
+        // BaSysDoc = ROUNDUP(110*0.05) = 5.50
+        // ProdVal = ROUNDUP(33*0.20) = 6.60
+        // devPlusDerived = 110+33+7.15+21.45+5.50+5.50+6.60 = 189.20
+        // PM = ROUNDUP(189.20*0.15) = 28.38
+        // Subtotal = 189.20 + 28.38 + 0 + 0 + 20 + 5 = 242.58
+        decimal effectiveDev = 110m;
+        decimal sysTest = MainViewModel.RoundUp(effectiveDev * 0.30m);
+        decimal analysis = MainViewModel.RoundUp((effectiveDev + sysTest) * 0.05m);
+        decimal bizDesign = MainViewModel.RoundUp((effectiveDev + sysTest) * 0.15m);
+        decimal promotion = MainViewModel.RoundUp(effectiveDev * 0.05m);
+        decimal baSysDoc = MainViewModel.RoundUp(effectiveDev * 0.05m);
+        decimal prodVal = MainViewModel.RoundUp(sysTest * 0.20m);
+        decimal devPlusDerived = effectiveDev + sysTest + analysis + bizDesign + promotion + baSysDoc + prodVal;
         decimal pm = MainViewModel.RoundUp(devPlusDerived * 0.15m);
-        decimal expected = devPlusDerived + pm + 0m + 10m + 20m + 5m;
+        decimal expected = devPlusDerived + pm + 0m + 0m + 20m + 5m;
         Assert.Equal(expected, vm.SubtotalHours);
     }
 

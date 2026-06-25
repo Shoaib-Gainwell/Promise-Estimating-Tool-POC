@@ -157,8 +157,8 @@ public class MainViewModelTests
 
         // Subtotal = 172 + 25.80 = 197.80
         // PM Reserve = ROUNDUP(197.80 * 0.05, 2) = ROUNDUP(9.89, 2) = 9.89
-        // Grand Total = 197.80 + 9.89 = 207.69
-        Assert.Equal(207.69m, vm.GrandTotalHours);
+        // Grand Total = Math.Ceiling(197.80 + 9.89) = Math.Ceiling(207.69) = 208
+        Assert.Equal(208m, vm.GrandTotalHours);
         Assert.Equal(9.89m, vm.PmReserveHours);
     }
 
@@ -308,15 +308,69 @@ public class MainViewModelTests
     public void ClearAll_RemovesAllComponents()
     {
         var vm = CreateVm();
+        vm.ProjectName = "Test Project";
+        vm.ChangeOrderId = "CO-001";
+        vm.ProjectDescription = "Some description";
+        vm.EstimatedBy = "Tester";
+        vm.ReviewedBy = "Reviewer";
+        vm.PmEffortPercentage = 20m;
+        vm.PmReservePercentage = 10m;
+        vm.DevelopmentAdjustedHours = 5m;
+        vm.AnalysisAdjustedHours = 2m;
+        vm.AdjustedHoursComments = "Adjusted for scope";
+        vm.SeAssumptions = "SE note";
+        vm.BaAssumptions = "BA note";
+        vm.CollaborationAssumptions = "Collab note";
+        vm.GeneralAssumptions = "General note";
+        vm.UseTestCasesForEstimate = true;
+        vm.TestCasesSimple = 10;
+        vm.TestCasesMedium = 5;
+        vm.TestCasesComplex = 3;
+        vm.TestCasesVeryComplex = 1;
+        vm.TestCaseIterations = 2;
         AddComponent(vm, ComponentType.Reports, ComponentSize.Small, ChangeType.New, 2);
         AddComponent(vm, ComponentType.Webpage, ComponentSize.Medium, ChangeType.Change, 1);
 
         vm.ClearAllCommand.Execute(null);
 
+        // Components and totals
         Assert.Empty(vm.Components);
         Assert.Equal(0m, vm.TotalDevelopmentHours);
         Assert.Equal(0m, vm.GrandTotalHours);
+        Assert.Equal(0m, vm.PmReserveHours);
+        Assert.Equal(0m, vm.ProjectManagementHours);
+        Assert.Equal(0, vm.ComponentCount);
         Assert.Equal("—", vm.TShirtSize);
+
+        // Header fields
+        Assert.Equal(string.Empty, vm.ProjectName);
+        Assert.Equal(string.Empty, vm.ChangeOrderId);
+        Assert.Equal(string.Empty, vm.ProjectDescription);
+        Assert.Equal(string.Empty, vm.EstimatedBy);
+        Assert.Equal(string.Empty, vm.ReviewedBy);
+
+        // PM defaults restored
+        Assert.Equal(15m, vm.PmEffortPercentage);
+        Assert.Equal(5m, vm.PmReservePercentage);
+
+        // Adjusted hours cleared
+        Assert.Equal(0m, vm.DevelopmentAdjustedHours);
+        Assert.Equal(0m, vm.AnalysisAdjustedHours);
+        Assert.Equal(string.Empty, vm.AdjustedHoursComments);
+
+        // Assumptions cleared
+        Assert.Equal(string.Empty, vm.SeAssumptions);
+        Assert.Equal(string.Empty, vm.BaAssumptions);
+        Assert.Equal(string.Empty, vm.CollaborationAssumptions);
+        Assert.Equal(string.Empty, vm.GeneralAssumptions);
+
+        // Test case fields cleared
+        Assert.False(vm.UseTestCasesForEstimate);
+        Assert.Equal(0, vm.TestCasesSimple);
+        Assert.Equal(0, vm.TestCasesMedium);
+        Assert.Equal(0, vm.TestCasesComplex);
+        Assert.Equal(0, vm.TestCasesVeryComplex);
+        Assert.Equal(1, vm.TestCaseIterations);
     }
 
     #endregion
@@ -337,11 +391,11 @@ public class MainViewModelTests
         Assert.Equal(0m, vm.BaSystemDocHours);
         Assert.Equal(0m, vm.ProductionValidationHours);
         Assert.Equal(0m, vm.ProjectManagementHours);
-        // Default collaboration items (WPRs, Client, Internal, Automation) contribute 93.75 hrs
-        Assert.Equal(93.75m, vm.TotalCollaborationHours);
+        // No default collaboration items
+        Assert.Equal(0m, vm.TotalCollaborationHours);
         Assert.Equal(0, vm.ComponentCount);
-        // T-Shirt Size = Small (Grand Total < 100)
-        Assert.Equal("Small", vm.TShirtSize);
+        // T-Shirt Size = "—" when no components exist
+        Assert.Equal("—", vm.TShirtSize);
     }
 
     [Fact]
@@ -391,10 +445,10 @@ public class MainViewModelTests
     public void TShirtSize_SmallProject()
     {
         var vm = CreateVm();
-        // Default collaboration (93.75) + 3 hrs dev + derived → Grand Total > 100 = Medium
+        // No default collaboration → 3 hrs dev + derived → Grand Total ~ 6.25 = Small
         // Test Automation UFT Small New = 3 hrs
         AddComponent(vm, ComponentType.TestAutomationUFT, ComponentSize.Small, ChangeType.New, 1);
-        Assert.Equal("Medium", vm.TShirtSize);
+        Assert.Equal("Small", vm.TShirtSize);
     }
 
     [Fact]
