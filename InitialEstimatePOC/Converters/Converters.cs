@@ -65,17 +65,17 @@ public class EnumDisplayConverter : IValueConverter
 {
     private static readonly Dictionary<ComponentType, string> ComponentTypeNames = new()
     {
-        [ComponentType.PowerBuilderWindows] = "PB Windows",
+        [ComponentType.PowerBuilderWindows] = "PowerBuilder Windows",
         [ComponentType.Reports] = "Reports",
-        [ComponentType.ProgramsDBStoredProcs] = "Programs / DB Stored Procs",
-        [ComponentType.SupportModules] = "Support Modules",
-        [ComponentType.DBManipulation] = "DB Manipulation",
+        [ComponentType.ProgramsDBStoredProcs] = "Programs/DB Stored Procedures",
+        [ComponentType.SupportModules] = "Support Modules/JOB/JIL.c,.sc,.ctl,.mak,.pl,.ar,.h,.l,.pkb,.pks,.y,.addidx,.awk,.ctl,.cfg,.conf,.html,.lst,.out,.pls,.par,.ps,.prm,.prn,.sql,.shl,.srt,.txt,.xml,.xsd,.xsl",
+        [ComponentType.DBManipulation] = "DB Manipulation (SQL, PL/SQL, etc.)",
         [ComponentType.DatabaseReview] = "Database Review",
-        [ComponentType.Webpage] = "Webpage",
+        [ComponentType.Webpage] = "Webpage (Includes UI, Portal & Intranet)",
         [ComponentType.K2Workflow] = "K2 Workflow",
         [ComponentType.K2SmartForm] = "K2 Smart Form",
-        [ComponentType.TestAutomationUFT] = "Test Automation (UFT)",
-        [ComponentType.MISC] = "MISC",
+        [ComponentType.TestAutomationUFT] = "Test Automation Suites (UFT)",
+        [ComponentType.MISC] = "MISC (Server Setup, Webserver Setup, Software Installation, etc.)",
     };
 
     private static readonly Dictionary<CollaborationType, string> CollaborationTypeNames = new()

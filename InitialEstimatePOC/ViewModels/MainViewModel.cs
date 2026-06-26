@@ -436,10 +436,16 @@ public partial class MainViewModel : ObservableObject
         // Step 2: System Testing (depends on effectiveDev)
         if (UseTestCasesForEstimate)
         {
-            decimal testHours = (TestCasesSimple * 0.5m + TestCasesMedium * 1.0m 
-                               + TestCasesComplex * 2.0m + TestCasesVeryComplex * 4.0m) 
-                               * Math.Max(1, TestCaseIterations);
-            SystemTestingHours = RoundUp(testHours);
+            // Test case-based formula matching Excel IntialEstWeightedValues rows 31 & 32:
+            // Row 31 = Write TC + Data Prep + ALM Tasks + Test Execution (per complexity)
+            // Row 32 = Write TC + ALM Tasks + Test Execution (excl. Data Prep) × 10% defect correction
+            const decimal r31Simple = 2.1925m, r31Medium = 4.065m, r31Complex = 8.76m, r31VeryComplex = 14.38m;
+            const decimal r32Simple = 1.5675m, r32Medium = 3.44m,  r32Complex = 7.51m, r32VeryComplex = 13.13m;
+            decimal mainHours   = TestCasesSimple * r31Simple + TestCasesMedium * r31Medium
+                                + TestCasesComplex * r31Complex + TestCasesVeryComplex * r31VeryComplex;
+            decimal defectHours = (TestCasesSimple * r32Simple + TestCasesMedium * r32Medium
+                                + TestCasesComplex * r32Complex + TestCasesVeryComplex * r32VeryComplex) * 0.1m;
+            SystemTestingHours = RoundUp((mainHours + defectHours) * Math.Max(1, TestCaseIterations));
         }
         else
         {
@@ -491,10 +497,11 @@ public partial class MainViewModel : ObservableObject
         ProjectManagementTotalHours = effectivePM;
         CollaborationTotalHours = effectiveCollab;
 
-        // Step 10: Subtotal = sum of all effective task totals + Time for Estimates + Actual Hours
-        SubtotalHours = effectiveDev + effectiveSysTest + effectiveAnalysis + effectiveBizDesign
+        // Step 10: Subtotal = ROUNDUP(SUM of all effective task totals + Time for Estimates + Actual Hours, 2)
+        // Matches Excel I43 = ROUNDUP(SUM(I27:I42), 2)
+        SubtotalHours = RoundUp(effectiveDev + effectiveSysTest + effectiveAnalysis + effectiveBizDesign
                       + effectivePromotion + effectiveBaSysDoc + effectiveProdVal
-                      + effectivePM + effectiveCollab + TimeForEstimates + TotalActualHours;
+                      + effectivePM + effectiveCollab + TimeForEstimates + TotalActualHours);
 
         // When no components and no adjusted dev hours exist, don't show totals in summary
         if (ComponentCount == 0 && effectiveDev == 0m)
@@ -515,13 +522,16 @@ public partial class MainViewModel : ObservableObject
             TShirtSize = WeightedValues.GetTShirtSize(GrandTotalHours);
         }
 
-        // === Role Breakout (uses effective values) ===
-        // BA = Analysis/2 + BusinessDesign + BADoc + ProdValidation + PM/2
+        // === Role Breakout (Excel rows 47-51) ===
+        // BA = ROUNDUP(Analysis/2 + BizDesign + BADoc + ProdVal + ActualHours/2 + TimeForEstimates/2, 2)
+        // Excel B47: ROUNDUP((I28/2)+I29+I32+I33+(I41/2)+(I42/2),2) — PM is NOT included
         BaRoleHours = RoundUp(effectiveAnalysis / 2m + effectiveBizDesign + effectiveBaSysDoc
-                     + effectiveProdVal + effectivePM / 2m);
+                     + effectiveProdVal + TotalActualHours / 2m + TimeForEstimates / 2m);
 
-        // SE = Development + Analysis/2 + Promotion + PM/2
-        SeRoleHours = RoundUp(effectiveDev + effectiveAnalysis / 2m + effectivePromotion + effectivePM / 2m);
+        // SE = ROUNDUP(Dev + Analysis/2 + Promotion + ActualHours/2 + TimeForEstimates/2, 2)
+        // Excel B48: ROUNDUP(I27+(I28/2)+I31+(I41/2)+(I42/2),2) — PM is NOT included
+        SeRoleHours = RoundUp(effectiveDev + effectiveAnalysis / 2m + effectivePromotion
+                     + TotalActualHours / 2m + TimeForEstimates / 2m);
 
         // Tester = System Testing (effective)
         TesterRoleHours = effectiveSysTest;
@@ -883,10 +893,10 @@ public partial class CollaborationRowViewModel : ObservableObject
     private string _notes = string.Empty;
 
     /// <summary>
-    /// Excel formula: NumMeetings × (MeetingDuration/60 + PrepTime/60) × NumParticipants
-    /// Example: 5 meetings × (60/60 + 15/60) × 3 participants = 5 × 1.25 × 3 = 18.75 hours
+    /// Excel formula: ROUNDUP((Meetings × Participants × Duration/60) + (Meetings × Participants × PrepTime/60), 2)
+    /// Matches Excel G36 = ROUNDUP((J36*L36*(K36/60))+(J36*L36*(M36/60)),2)
     /// </summary>
-    public decimal TotalHours => NumberOfMeetings * ((MeetingDurationMinutes / 60m) + (ParticipantPrepTimeMinutes / 60m)) * NumberOfParticipants;
+    public decimal TotalHours => MainViewModel.RoundUp(NumberOfMeetings * ((MeetingDurationMinutes / 60m) + (ParticipantPrepTimeMinutes / 60m)) * NumberOfParticipants);
 
     partial void OnNumberOfMeetingsChanged(int value) => OnPropertyChanged(nameof(TotalHours));
     partial void OnMeetingDurationMinutesChanged(int value) => OnPropertyChanged(nameof(TotalHours));

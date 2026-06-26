@@ -277,8 +277,8 @@ public class PersistenceRoundTripTests
         Assert.Equal(2, vm.TestCasesVeryComplex);
         Assert.Equal(3, vm.TestCaseIterations);
 
-        // Verify calculation: (20*0.5 + 10*1 + 5*2 + 2*4) * 3 = (10+10+10+8) * 3 = 114
-        Assert.Equal(114m, vm.SystemTestingHours);
+        // Verify calculation: row31: 20*2.1925+10*4.065+5*8.76+2*14.38=157.06  defect*0.1=12.956  → ROUNDUP(170.016*3,2)=510.05
+        Assert.Equal(510.05m, vm.SystemTestingHours);
     }
 
     [Fact]

@@ -157,15 +157,15 @@ public static class WeightedValues
     {
         ComponentType.PowerBuilderWindows => "PowerBuilder Windows",
         ComponentType.Reports => "Reports",
-        ComponentType.ProgramsDBStoredProcs => "Programs/DB Stored Procs",
-        ComponentType.SupportModules => "Support Modules",
-        ComponentType.DBManipulation => "DB Manipulation",
+        ComponentType.ProgramsDBStoredProcs => "Programs/DB Stored Procedures",
+        ComponentType.SupportModules => "Support Modules/JOB/JIL",
+        ComponentType.DBManipulation => "DB Manipulation (SQL, PL/SQL, etc.)",
         ComponentType.DatabaseReview => "Database Review",
-        ComponentType.Webpage => "Webpage",
+        ComponentType.Webpage => "Webpage (Includes UI, Portal & Intranet)",
         ComponentType.K2Workflow => "K2 Workflow",
         ComponentType.K2SmartForm => "K2 Smart Form",
-        ComponentType.TestAutomationUFT => "Test Automation (UFT)",
-        ComponentType.MISC => "MISC",
+        ComponentType.TestAutomationUFT => "Test Automation Suites (UFT)",
+        ComponentType.MISC => "MISC (Server Setup, Webserver Setup, Software Installation, etc.)",
         _ => type.ToString()
     };
 

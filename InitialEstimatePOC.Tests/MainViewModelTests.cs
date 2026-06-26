@@ -231,11 +231,11 @@ public class MainViewModelTests
         var vm = CreateVm();
         AddComponent(vm, ComponentType.MISC, ComponentSize.Large, ChangeType.New, 1);
 
-        // BA = Analysis/2 + BusinessDesign + BADoc + ProdValidation + PM/2
-        // = 6.50/2 + 19.50 + 5.00 + 6.00 + 25.80/2
-        // = 3.25 + 19.50 + 5.00 + 6.00 + 12.90 = 46.65
-        // ROUNDUP(46.65, 2) = 46.65 (exact)
-        Assert.Equal(46.65m, vm.BaRoleHours);
+        // BA = Analysis/2 + BusinessDesign + BADoc + ProdValidation + ActualHours/2 + TimeForEstimates/2
+        // = 6.50/2 + 19.50 + 5.00 + 6.00 + 0/2 + 0/2
+        // = 3.25 + 19.50 + 5.00 + 6.00 = 33.75
+        // ROUNDUP(33.75, 2) = 33.75 (exact)
+        Assert.Equal(33.75m, vm.BaRoleHours);
     }
 
     [Fact]
@@ -244,11 +244,11 @@ public class MainViewModelTests
         var vm = CreateVm();
         AddComponent(vm, ComponentType.MISC, ComponentSize.Large, ChangeType.New, 1);
 
-        // SE = Dev + Analysis/2 + Promotion + PM/2
-        // = 100 + 6.50/2 + 5.00 + 25.80/2
-        // = 100 + 3.25 + 5.00 + 12.90 = 121.15
-        // ROUNDUP(121.15, 2) = 121.15 (exact)
-        Assert.Equal(121.15m, vm.SeRoleHours);
+        // SE = Dev + Analysis/2 + Promotion + ActualHours/2 + TimeForEstimates/2
+        // = 100 + 6.50/2 + 5.00 + 0/2 + 0/2
+        // = 100 + 3.25 + 5.00 = 108.25
+        // ROUNDUP(108.25, 2) = 108.25 (exact)
+        Assert.Equal(108.25m, vm.SeRoleHours);
     }
 
     #endregion

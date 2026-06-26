@@ -96,14 +96,13 @@ public class FullCalculationPipelineTests
         // = 444.645 → ROUNDUP = 444.65
         decimal baExpected = MainViewModel.RoundUp(
             vm.AnalysisHours / 2m + vm.BusinessDesignHours + vm.BaSystemDocHours
-            + vm.ProductionValidationHours + vm.ProjectManagementHours / 2m);
+            + vm.ProductionValidationHours + vm.TotalActualHours / 2m + vm.TimeForEstimates / 2m);
         Assert.Equal(baExpected, vm.BaRoleHours);
 
-        // SE = Dev + Analysis/2 + Promotion + PM/2
-        // = 953.10 + 30.98 + 47.66 + 122.955
-        // = 1154.695 → ROUNDUP = 1154.70
+        // SE = Dev + Analysis/2 + Promotion + ActualHours/2 + TimeForEstimates/2
         decimal seExpected = MainViewModel.RoundUp(
-            vm.TotalDevelopmentHours + vm.AnalysisHours / 2m + vm.PromotionHours + vm.ProjectManagementHours / 2m);
+            vm.TotalDevelopmentHours + vm.AnalysisHours / 2m + vm.PromotionHours
+            + vm.TotalActualHours / 2m + vm.TimeForEstimates / 2m);
         Assert.Equal(seExpected, vm.SeRoleHours);
 
         // Tester = System Testing
@@ -288,20 +287,20 @@ public class FullCalculationPipelineTests
         AddComponent(vm, ComponentType.MISC, ComponentSize.Large, ChangeType.New, 1); // Dev = 100
 
         vm.UseTestCasesForEstimate = true;
-        vm.TestCasesSimple = 10;     // 10 * 0.5 = 5
-        vm.TestCasesMedium = 5;      // 5 * 1.0 = 5
-        vm.TestCasesComplex = 3;     // 3 * 2.0 = 6
-        vm.TestCasesVeryComplex = 1; // 1 * 4.0 = 4
-        vm.TestCaseIterations = 2;   // (5+5+6+4) * 2 = 40
+        vm.TestCasesSimple = 10;     // row31: 10*2.1925=21.925  row32defect: 10*1.5675*0.1=1.5675
+        vm.TestCasesMedium = 5;      // row31: 5*4.065=20.325    row32defect: 5*3.44*0.1=1.72
+        vm.TestCasesComplex = 3;     // row31: 3*8.76=26.28      row32defect: 3*7.51*0.1=2.253
+        vm.TestCasesVeryComplex = 1; // row31: 1*14.38=14.38     row32defect: 1*13.13*0.1=1.313
+        vm.TestCaseIterations = 2;   // main=82.91 defect=6.8535 → ROUNDUP(89.7635*2,2)=179.53
 
         Assert.Equal(100m, vm.TotalDevelopmentHours);
-        Assert.Equal(40m, vm.SystemTestingHours);
+        Assert.Equal(179.53m, vm.SystemTestingHours);
 
-        // Analysis = ROUNDUP((100 + 40) * 0.05, 2) = ROUNDUP(7.00, 2) = 7.00
-        Assert.Equal(7.00m, vm.AnalysisHours);
+        // Analysis = ROUNDUP((100 + 179.53) * 0.05, 2) = ROUNDUP(13.9765, 2) = 13.98
+        Assert.Equal(13.98m, vm.AnalysisHours);
 
-        // BizDesign = ROUNDUP((100 + 40) * 0.15, 2) = ROUNDUP(21.00, 2) = 21.00
-        Assert.Equal(21.00m, vm.BusinessDesignHours);
+        // BizDesign = ROUNDUP((100 + 179.53) * 0.15, 2) = ROUNDUP(41.9295, 2) = 41.93
+        Assert.Equal(41.93m, vm.BusinessDesignHours);
 
         // Promotion = ROUNDUP(100 * 0.05, 2) = 5.00
         Assert.Equal(5.00m, vm.PromotionHours);
@@ -309,11 +308,11 @@ public class FullCalculationPipelineTests
         // BADoc = ROUNDUP(100 * 0.05, 2) = 5.00
         Assert.Equal(5.00m, vm.BaSystemDocHours);
 
-        // ProdVal = ROUNDUP(40 * 0.20, 2) = 8.00
-        Assert.Equal(8.00m, vm.ProductionValidationHours);
+        // ProdVal = ROUNDUP(179.53 * 0.20, 2) = ROUNDUP(35.906, 2) = 35.91
+        Assert.Equal(35.91m, vm.ProductionValidationHours);
 
-        // PM = ROUNDUP((100+40+7+21+5+5+8) * 0.15, 2) = ROUNDUP(186 * 0.15, 2) = ROUNDUP(27.90, 2) = 27.90
-        Assert.Equal(27.90m, vm.ProjectManagementHours);
+        // PM = ROUNDUP((100+179.53+13.98+41.93+5+5+35.91) * 0.15, 2) = ROUNDUP(381.35*0.15,2) = ROUNDUP(57.2025,2) = 57.21
+        Assert.Equal(57.21m, vm.ProjectManagementHours);
     }
 
     #endregion

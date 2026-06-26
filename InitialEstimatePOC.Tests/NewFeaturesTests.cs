@@ -45,13 +45,13 @@ public class NewFeaturesTests
     {
         var vm = CreateVm();
         vm.UseTestCasesForEstimate = true;
-        vm.TestCasesSimple = 10;  // 10 * 0.5 = 5
-        vm.TestCasesMedium = 5;   // 5 * 1.0 = 5
-        vm.TestCasesComplex = 3;  // 3 * 2.0 = 6
-        vm.TestCasesVeryComplex = 2; // 2 * 4.0 = 8
+        vm.TestCasesSimple = 10;     // row31: 10*2.1925=21.925  row32defect: 10*1.5675*0.1=1.5675
+        vm.TestCasesMedium = 5;      // row31: 5*4.065=20.325    row32defect: 5*3.44*0.1=1.72
+        vm.TestCasesComplex = 3;     // row31: 3*8.76=26.28      row32defect: 3*7.51*0.1=2.253
+        vm.TestCasesVeryComplex = 2; // row31: 2*14.38=28.76     row32defect: 2*13.13*0.1=2.626
         vm.TestCaseIterations = 1;
-        // Total = (5 + 5 + 6 + 8) * 1 = 24
-        Assert.Equal(24m, vm.SystemTestingHours);
+        // main=(97.29) defect=(8.1665) → ROUNDUP((97.29+8.1665)*1,2) = 105.46
+        Assert.Equal(105.46m, vm.SystemTestingHours);
     }
 
     [Fact]
@@ -59,13 +59,13 @@ public class NewFeaturesTests
     {
         var vm = CreateVm();
         vm.UseTestCasesForEstimate = true;
-        vm.TestCasesSimple = 4;   // 4 * 0.5 = 2
-        vm.TestCasesMedium = 2;   // 2 * 1.0 = 2
+        vm.TestCasesSimple = 4;   // row31: 4*2.1925=8.77   row32defect: 4*1.5675*0.1=0.627
+        vm.TestCasesMedium = 2;   // row31: 2*4.065=8.13    row32defect: 2*3.44*0.1=0.688
         vm.TestCasesComplex = 0;
         vm.TestCasesVeryComplex = 0;
         vm.TestCaseIterations = 3;
-        // Total = (2 + 2) * 3 = 12
-        Assert.Equal(12m, vm.SystemTestingHours);
+        // main=(16.9) defect=(1.315) → ROUNDUP(18.215*3,2) = 54.65
+        Assert.Equal(54.65m, vm.SystemTestingHours);
     }
 
     [Fact]
@@ -90,9 +90,9 @@ public class NewFeaturesTests
         Assert.True(percentBased > 0);
 
         vm.UseTestCasesForEstimate = true;
-        vm.TestCasesSimple = 2; // 2 * 0.5 * 1 = 1
+        vm.TestCasesSimple = 2; // row31: 2*2.1925=4.385 row32defect: 2*1.5675*0.1=0.3135 → ROUNDUP(4.6985,2)=4.70
         vm.TestCaseIterations = 1;
-        Assert.Equal(1m, vm.SystemTestingHours);
+        Assert.Equal(4.70m, vm.SystemTestingHours);
         Assert.NotEqual(percentBased, vm.SystemTestingHours);
     }
 
@@ -117,9 +117,9 @@ public class NewFeaturesTests
     {
         var vm = CreateVm();
         vm.UseTestCasesForEstimate = true;
-        vm.TestCasesComplex = 10; // 10 * 2 = 20
-        vm.TestCaseIterations = 2; // 20 * 2 = 40
-        Assert.Equal(40m, vm.SystemTestingHours);
+        vm.TestCasesComplex = 10; // row31: 10*8.76=87.6  row32defect: 10*7.51*0.1=7.51 → ROUNDUP(95.11*2,2)=190.22
+        vm.TestCaseIterations = 2;
+        Assert.Equal(190.22m, vm.SystemTestingHours);
     }
 
     [Fact]
@@ -127,9 +127,9 @@ public class NewFeaturesTests
     {
         var vm = CreateVm();
         vm.UseTestCasesForEstimate = true;
-        vm.TestCasesVeryComplex = 5; // 5 * 4 = 20
+        vm.TestCasesVeryComplex = 5; // row31: 5*14.38=71.9  row32defect: 5*13.13*0.1=6.565 → ROUNDUP(78.465,2)=78.47
         vm.TestCaseIterations = 1;
-        Assert.Equal(20m, vm.SystemTestingHours);
+        Assert.Equal(78.47m, vm.SystemTestingHours);
     }
 
     [Fact]
@@ -138,13 +138,13 @@ public class NewFeaturesTests
         var vm = CreateVm();
         AddComponent(vm, ComponentType.PowerBuilderWindows, ComponentSize.Medium, ChangeType.New, 1);
         vm.UseTestCasesForEstimate = true;
-        vm.TestCasesSimple = 20; // 20 * 0.5 = 10
+        vm.TestCasesSimple = 20; // row31: 20*2.1925=43.85  row32defect: 20*1.5675*0.1=3.135 → ROUNDUP(46.985,2)=46.99
         vm.TestCaseIterations = 1;
 
-        // System testing = 10
-        Assert.Equal(10m, vm.SystemTestingHours);
-        // Production Validation = ROUNDUP(10 * 20%) = ROUNDUP(2) = 2
-        Assert.Equal(2m, vm.ProductionValidationHours);
+        // System testing = 46.99
+        Assert.Equal(46.99m, vm.SystemTestingHours);
+        // Production Validation = ROUNDUP(46.99 * 20%) = ROUNDUP(9.398) = 9.40
+        Assert.Equal(9.40m, vm.ProductionValidationHours);
     }
 
     #endregion
@@ -156,9 +156,9 @@ public class NewFeaturesTests
     {
         var vm = CreateVm();
         vm.UseTestCasesForEstimate = true;
-        vm.TestCasesSimple = 10; // 10 * 0.5 = 5
+        vm.TestCasesSimple = 10; // ROUNDUP((10*2.1925 + 10*1.5675*0.1)*1,2) = ROUNDUP(23.4925,2) = 23.50
         vm.TestCaseIterations = 0; // Should be treated as 1 (Math.Max(1, 0))
-        Assert.Equal(5m, vm.SystemTestingHours);
+        Assert.Equal(23.50m, vm.SystemTestingHours);
     }
 
     [Fact]
@@ -166,9 +166,9 @@ public class NewFeaturesTests
     {
         var vm = CreateVm();
         vm.UseTestCasesForEstimate = true;
-        vm.TestCasesSimple = 10; // 10 * 0.5 = 5
+        vm.TestCasesSimple = 10; // ROUNDUP((10*2.1925 + 10*1.5675*0.1)*1,2) = ROUNDUP(23.4925,2) = 23.50
         vm.TestCaseIterations = -5; // Should be treated as 1
-        Assert.Equal(5m, vm.SystemTestingHours);
+        Assert.Equal(23.50m, vm.SystemTestingHours);
     }
 
     [Fact]
@@ -176,9 +176,9 @@ public class NewFeaturesTests
     {
         var vm = CreateVm();
         vm.UseTestCasesForEstimate = true;
-        vm.TestCasesVeryComplex = 1000; // 1000 * 4 = 4000
-        vm.TestCaseIterations = 5; // 4000 * 5 = 20000
-        Assert.Equal(20000m, vm.SystemTestingHours);
+        vm.TestCasesVeryComplex = 1000; // row31: 1000*14.38=14380  row32defect: 1000*13.13*0.1=1313 → (14380+1313)*5=78465
+        vm.TestCaseIterations = 5;
+        Assert.Equal(78465m, vm.SystemTestingHours);
     }
 
     [Fact]
@@ -485,8 +485,8 @@ public class NewFeaturesTests
         Assert.Equal(3, vm.TestCasesComplex);
         Assert.Equal(1, vm.TestCasesVeryComplex);
         Assert.Equal(2, vm.TestCaseIterations);
-        // Verify calculation: (10*0.5 + 5*1 + 3*2 + 1*4) * 2 = (5+5+6+4)*2 = 40
-        Assert.Equal(40m, vm.SystemTestingHours);
+        // Verify calculation: row31: 10*2.1925+5*4.065+3*8.76+1*14.38=82.91  defect*0.1=6.8535  → ROUNDUP(89.7635*2,2)=179.53
+        Assert.Equal(179.53m, vm.SystemTestingHours);
     }
 
     [Fact]
@@ -593,11 +593,9 @@ public class NewFeaturesTests
     {
         var vm = CreateVm();
         vm.UseTestCasesForEstimate = true;
-        vm.TestCasesSimple = 3; // 3 * 0.5 = 1.5
+        vm.TestCasesSimple = 3; // ROUNDUP((3*2.1925 + 3*1.5675*0.1)*1,2) = ROUNDUP(7.04775,2) = 7.05
         vm.TestCaseIterations = 1;
-        // RoundUp(1.5) = 2 (rounds up at 3rd decimal, but 1.5 is exact → 1.50)
-        // Actually 1.5 is exact to 2 decimals, so RoundUp returns 1.50
-        Assert.Equal(1.50m, vm.SystemTestingHours);
+        Assert.Equal(7.05m, vm.SystemTestingHours);
     }
 
     [Fact]
@@ -605,10 +603,10 @@ public class NewFeaturesTests
     {
         var vm = CreateVm();
         vm.UseTestCasesForEstimate = true;
-        vm.TestCasesSimple = 1; // 1 * 0.5 = 0.5
-        vm.TestCasesMedium = 1; // 1 * 1 = 1
-        vm.TestCaseIterations = 3; // (0.5 + 1) * 3 = 4.5
-        Assert.Equal(4.50m, vm.SystemTestingHours);
+        vm.TestCasesSimple = 1; // row31: 2.1925  row32defect: 1.5675*0.1=0.15675
+        vm.TestCasesMedium = 1; // row31: 4.065   row32defect: 3.44*0.1=0.344
+        vm.TestCaseIterations = 3; // ROUNDUP((6.2575+0.50075)*3,2) = ROUNDUP(20.27475,2) = 20.28
+        Assert.Equal(20.28m, vm.SystemTestingHours);
     }
 
     [Fact]
@@ -640,15 +638,15 @@ public class NewFeaturesTests
         decimal dev = vm.TotalDevelopmentHours;
 
         vm.UseTestCasesForEstimate = true;
-        vm.TestCasesMedium = 100; // 100 * 1 = 100
+        vm.TestCasesMedium = 100; // row31: 100*4.065=406.5  row32defect: 100*3.44*0.1=34.4 → ROUNDUP(440.9,2)=440.90
         vm.TestCaseIterations = 1;
-        // System Testing = 100
-        Assert.Equal(100m, vm.SystemTestingHours);
-        // Analysis = ROUNDUP((dev + 100) * 5%)
-        decimal expectedAnalysis = MainViewModel.RoundUp((dev + 100m) * 0.05m);
+        // System Testing = 440.90
+        Assert.Equal(440.90m, vm.SystemTestingHours);
+        // Analysis = ROUNDUP((dev + 440.90) * 5%)
+        decimal expectedAnalysis = MainViewModel.RoundUp((dev + 440.90m) * 0.05m);
         Assert.Equal(expectedAnalysis, vm.AnalysisHours);
-        // Business Design = ROUNDUP((dev + 100) * 15%)
-        decimal expectedBD = MainViewModel.RoundUp((dev + 100m) * 0.15m);
+        // Business Design = ROUNDUP((dev + 440.90) * 15%)
+        decimal expectedBD = MainViewModel.RoundUp((dev + 440.90m) * 0.15m);
         Assert.Equal(expectedBD, vm.BusinessDesignHours);
     }
 

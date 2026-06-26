@@ -143,9 +143,9 @@ public class CollaborationTests
             ParticipantPrepTimeMinutes = 5
         };
 
-        // 10 × (0.25 + 0.0833...) × 2 = 10 × 0.3333... × 2 = 6.6666...
+        // 10 × (0.25 + 0.0833...) × 2 = 6.6666... → ROUNDUP(6.6666...,2) = 6.67
         decimal expected = 10m * ((15m / 60m) + (5m / 60m)) * 2m;
-        Assert.Equal(expected, row.TotalHours);
+        Assert.Equal(MainViewModel.RoundUp(expected), row.TotalHours);
     }
 
     #endregion
