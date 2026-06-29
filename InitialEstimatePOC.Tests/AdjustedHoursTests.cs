@@ -294,67 +294,18 @@ public class AdjustedHoursTests
 
     #endregion
 
-    #region PM Reserve Percentage
+    #region Grand Total = Ceiling of Subtotal
 
     [Fact]
-    public void PmReservePercentage_Default5Percent()
-    {
-        var vm = CreateVm();
-        Assert.Equal(5m, vm.PmReservePercentage);
-    }
-
-    [Fact]
-    public void PmReservePercentage_ChangeRecalculates()
-    {
-        var vm = CreateVm();
-        AddMiscLarge(vm);
-        decimal reserve5 = vm.PmReserveHours;
-
-        vm.PmReservePercentage = 10m;
-        decimal reserve10 = vm.PmReserveHours;
-
-        Assert.True(reserve10 > reserve5);
-        // Approximately double
-        Assert.InRange(reserve10, reserve5 * 1.9m, reserve5 * 2.1m);
-    }
-
-    [Fact]
-    public void PmReservePercentage_Zero_NoReserve()
-    {
-        var vm = CreateVm();
-        AddMiscLarge(vm);
-        vm.PmReservePercentage = 0m;
-        Assert.Equal(0m, vm.PmReserveHours);
-        Assert.Equal(Math.Ceiling(vm.SubtotalHours), vm.GrandTotalHours);
-    }
-
-    [Fact]
-    public void PmReserve_ROUNDUP_Applied()
-    {
-        var vm = CreateVm();
-        // With no components, PM Reserve = 0 (summary hidden)
-        Assert.Equal(0m, vm.PmReserveHours);
-        // Add a component so reserve is calculated
-        AddMiscLarge(vm);
-        // Now subtotal includes dev + derived + collab, reserve should use ROUNDUP
-        Assert.True(vm.PmReserveHours > 0m);
-    }
-
-    #endregion
-
-    #region Grand Total = Subtotal + PM Reserve
-
-    [Fact]
-    public void GrandTotal_AlwaysEqualsSubtotalPlusReserve()
+    public void GrandTotal_AlwaysEqualsCeilingOfSubtotal()
     {
         var vm = CreateVm();
         AddMiscLarge(vm);
         vm.DevelopmentAdjustedHours = 25m;
-        vm.PmReservePercentage = 7m;
         vm.TimeForEstimates = 15m;
         vm.TotalActualHours = 10m;
 
-        Assert.Equal(Math.Ceiling(vm.SubtotalHours + vm.PmReserveHours), vm.GrandTotalHours);
+        Assert.Equal(Math.Ceiling(vm.SubtotalHours), vm.GrandTotalHours);
     }
 
     #endregion
@@ -631,8 +582,8 @@ public class AdjustedHoursTests
     {
         var vm = CreateVm();
         AddMiscLarge(vm);
-        // SubtotalHours + PmReserveHours is typically not a whole number
-        decimal raw = vm.SubtotalHours + vm.PmReserveHours;
+        // SubtotalHours is typically not a whole number before ceiling
+        decimal raw = vm.SubtotalHours;
         if (raw != Math.Floor(raw))
         {
             Assert.True(vm.GrandTotalHours > raw);
@@ -658,13 +609,10 @@ public class AdjustedHoursTests
         AddMiscLarge(vm);
 
         vm.DevelopmentAdjustedHours = 13m;
-        Assert.Equal(Math.Ceiling(vm.SubtotalHours + vm.PmReserveHours), vm.GrandTotalHours);
+        Assert.Equal(Math.Ceiling(vm.SubtotalHours), vm.GrandTotalHours);
 
         vm.SystemTestingAdjustedHours = 7m;
-        Assert.Equal(Math.Ceiling(vm.SubtotalHours + vm.PmReserveHours), vm.GrandTotalHours);
-
-        vm.PmReservePercentage = 8m;
-        Assert.Equal(Math.Ceiling(vm.SubtotalHours + vm.PmReserveHours), vm.GrandTotalHours);
+        Assert.Equal(Math.Ceiling(vm.SubtotalHours), vm.GrandTotalHours);
     }
 
     #endregion

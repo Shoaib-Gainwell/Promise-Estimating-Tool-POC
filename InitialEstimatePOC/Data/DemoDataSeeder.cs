@@ -39,7 +39,7 @@ public static class DemoDataSeeder
         ChangeOrderId = "DEF-2026-0012",
         ProjectDescription = "Fix provider address validation on the network maintenance screen. Corrects ZIP+4 parsing and state dropdown population.",
         EstimatedBy = "RWilliams", ReviewedBy = "KChen",
-        PmEffortPercentage = 15m, PmReservePercentage = 5m,
+        PmEffortPercentage = 15m,
         TotalDevelopmentHours = 25.00m, GrandTotalHours = 65.28m, TShirtSize = "Small",
         CollaborationHours = 18.75m,
         DevelopmentAdjustedHours = 0m, AnalysisAdjustedHours = 0m, BusinessDesignAdjustedHours = 0m,
@@ -64,7 +64,6 @@ public static class DemoDataSeeder
             new() { LineNumber = 2, TaskName = "Client Meetings", CollaborationType = "ClientMeetings", NumberOfMeetings = 2, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 7.50m, Notes = "Defect review with client" },
             new() { LineNumber = 3, TaskName = "Internal Meetings", CollaborationType = "InternalMeetings", NumberOfMeetings = 2, MeetingDurationMinutes = 30, NumberOfParticipants = 2, ParticipantPrepTimeMinutes = 10, TotalHours = 2.67m, Notes = "Daily standup coverage" },
             new() { LineNumber = 4, TaskName = "Automation Test Collaboration", CollaborationType = "AutomationTestCollaboration", NumberOfMeetings = 1, MeetingDurationMinutes = 45, NumberOfParticipants = 2, ParticipantPrepTimeMinutes = 15, TotalHours = 2.00m, Notes = "Regression test update" },
-            new() { LineNumber = 5, TaskName = "Consultant/Mentor Effort", CollaborationType = "ConsultantMentorEffort", NumberOfMeetings = 0, MeetingDurationMinutes = 0, NumberOfParticipants = 0, ParticipantPrepTimeMinutes = 0, TotalHours = 0m, Notes = "N/A" },
         }
     };
 
@@ -74,7 +73,7 @@ public static class DemoDataSeeder
         ChangeOrderId = "CO-2026-0198",
         ProjectDescription = "Automated prior authorization letter generation with configurable templates. Supports PDF output, member/provider letters, and batch printing.",
         EstimatedBy = "KChen", ReviewedBy = "MJohnson",
-        PmEffortPercentage = 15m, PmReservePercentage = 5m,
+        PmEffortPercentage = 15m,
         TotalDevelopmentHours = 145.13m, GrandTotalHours = 215.45m, TShirtSize = "Medium",
         CollaborationHours = 37.50m,
         DevelopmentAdjustedHours = 5m, AnalysisAdjustedHours = 0m, BusinessDesignAdjustedHours = 0m,
@@ -102,7 +101,6 @@ public static class DemoDataSeeder
             new() { LineNumber = 2, TaskName = "Client Meetings", CollaborationType = "ClientMeetings", NumberOfMeetings = 3, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 11.25m, Notes = "Kickoff, mid-point, sign-off" },
             new() { LineNumber = 3, TaskName = "Internal Meetings", CollaborationType = "InternalMeetings", NumberOfMeetings = 2, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 7.50m, Notes = "Sprint planning" },
             new() { LineNumber = 4, TaskName = "Automation Test Collaboration", CollaborationType = "AutomationTestCollaboration", NumberOfMeetings = 0, MeetingDurationMinutes = 0, NumberOfParticipants = 0, ParticipantPrepTimeMinutes = 0, TotalHours = 0m, Notes = "Manual testing only" },
-            new() { LineNumber = 5, TaskName = "Consultant/Mentor Effort", CollaborationType = "ConsultantMentorEffort", NumberOfMeetings = 0, MeetingDurationMinutes = 0, NumberOfParticipants = 0, ParticipantPrepTimeMinutes = 0, TotalHours = 0m, Notes = "N/A" },
         }
     };
 
@@ -112,7 +110,7 @@ public static class DemoDataSeeder
         ChangeOrderId = "CO-2026-0289",
         ProjectDescription = "Real-time KPI dashboard for claims volume, turnaround times, and provider network metrics with drill-down and export.",
         EstimatedBy = "MJohnson", ReviewedBy = "APatel",
-        PmEffortPercentage = 15m, PmReservePercentage = 5m,
+        PmEffortPercentage = 15m,
         TotalDevelopmentHours = 187.88m, GrandTotalHours = 490.75m, TShirtSize = "Large",
         CollaborationHours = 56.25m,
         DevelopmentAdjustedHours = 10m, AnalysisAdjustedHours = 0m, BusinessDesignAdjustedHours = 5m,
@@ -139,7 +137,6 @@ public static class DemoDataSeeder
             new() { LineNumber = 2, TaskName = "Client Meetings", CollaborationType = "ClientMeetings", NumberOfMeetings = 4, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 15.00m, Notes = "Bi-weekly executive demos" },
             new() { LineNumber = 3, TaskName = "Internal Meetings", CollaborationType = "InternalMeetings", NumberOfMeetings = 3, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 11.25m, Notes = "Sprint + DBA coordination" },
             new() { LineNumber = 4, TaskName = "Automation Test Collaboration", CollaborationType = "AutomationTestCollaboration", NumberOfMeetings = 0, MeetingDurationMinutes = 0, NumberOfParticipants = 0, ParticipantPrepTimeMinutes = 0, TotalHours = 0m, Notes = "Manual testing only" },
-            new() { LineNumber = 5, TaskName = "Consultant/Mentor Effort", CollaborationType = "ConsultantMentorEffort", NumberOfMeetings = 0, MeetingDurationMinutes = 0, NumberOfParticipants = 0, ParticipantPrepTimeMinutes = 0, TotalHours = 0m, Notes = "N/A" },
         }
     };
 
@@ -149,7 +146,7 @@ public static class DemoDataSeeder
         ChangeOrderId = "CO-2026-0523",
         ProjectDescription = "Web-based member portal for eligibility verification, ID card requests, benefit inquiries, and claims status tracking.",
         EstimatedBy = "APatel", ReviewedBy = "JSmith",
-        PmEffortPercentage = 15m, PmReservePercentage = 5m,
+        PmEffortPercentage = 15m,
         TotalDevelopmentHours = 428.63m, GrandTotalHours = 952.18m, TShirtSize = "X-Large",
         CollaborationHours = 75.00m,
         DevelopmentAdjustedHours = 15m, AnalysisAdjustedHours = 3m, BusinessDesignAdjustedHours = 5m,
@@ -179,7 +176,6 @@ public static class DemoDataSeeder
             new() { LineNumber = 2, TaskName = "Client Meetings", CollaborationType = "ClientMeetings", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 18.75m, Notes = "Weekly + demos" },
             new() { LineNumber = 3, TaskName = "Internal Meetings", CollaborationType = "InternalMeetings", NumberOfMeetings = 3, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 11.25m, Notes = "Sprint + arch review" },
             new() { LineNumber = 4, TaskName = "Automation Test Collaboration", CollaborationType = "AutomationTestCollaboration", NumberOfMeetings = 2, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 7.50m, Notes = "Test strategy" },
-            new() { LineNumber = 5, TaskName = "Consultant/Mentor Effort", CollaborationType = "ConsultantMentorEffort", NumberOfMeetings = 0, MeetingDurationMinutes = 0, NumberOfParticipants = 0, ParticipantPrepTimeMinutes = 0, TotalHours = 0m, Notes = "N/A" },
         }
     };
 
@@ -189,7 +185,7 @@ public static class DemoDataSeeder
         ChangeOrderId = "CO-2026-0451",
         ProjectDescription = "Modernize claims adjudication workflow with automated rules engine, K2 integration, and real-time eligibility verification.",
         EstimatedBy = "JSmith", ReviewedBy = "LThompson",
-        PmEffortPercentage = 15m, PmReservePercentage = 5m,
+        PmEffortPercentage = 15m,
         TotalDevelopmentHours = 674.13m, GrandTotalHours = 1525.80m, TShirtSize = "XL1",
         CollaborationHours = 93.75m,
         DevelopmentAdjustedHours = 20m, AnalysisAdjustedHours = 5m, BusinessDesignAdjustedHours = 10m,
@@ -218,7 +214,6 @@ public static class DemoDataSeeder
             new() { LineNumber = 2, TaskName = "Client Meetings", CollaborationType = "ClientMeetings", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 18.75m, Notes = "Weekly + steering" },
             new() { LineNumber = 3, TaskName = "Internal Meetings", CollaborationType = "InternalMeetings", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 18.75m, Notes = "Sprint + arch" },
             new() { LineNumber = 4, TaskName = "Automation Test Collaboration", CollaborationType = "AutomationTestCollaboration", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 18.75m, Notes = "Regression strategy" },
-            new() { LineNumber = 5, TaskName = "Consultant/Mentor Effort", CollaborationType = "ConsultantMentorEffort", NumberOfMeetings = 0, MeetingDurationMinutes = 0, NumberOfParticipants = 0, ParticipantPrepTimeMinutes = 0, TotalHours = 0m, Notes = "N/A" },
         }
     };
 
@@ -228,7 +223,7 @@ public static class DemoDataSeeder
         ChangeOrderId = "CO-2026-0612",
         ProjectDescription = "End-to-end provider credentialing, contracting, and network adequacy management with CAQH integration.",
         EstimatedBy = "LThompson", ReviewedBy = "DGarcia",
-        PmEffortPercentage = 15m, PmReservePercentage = 5m,
+        PmEffortPercentage = 15m,
         TotalDevelopmentHours = 1427.53m, GrandTotalHours = 2850.00m, TShirtSize = "XL2",
         CollaborationHours = 93.75m,
         DevelopmentAdjustedHours = 30m, AnalysisAdjustedHours = 8m, BusinessDesignAdjustedHours = 15m,
@@ -257,7 +252,6 @@ public static class DemoDataSeeder
             new() { LineNumber = 2, TaskName = "Client Meetings", CollaborationType = "ClientMeetings", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 18.75m, Notes = "Weekly status" },
             new() { LineNumber = 3, TaskName = "Internal Meetings", CollaborationType = "InternalMeetings", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 18.75m, Notes = "Architecture" },
             new() { LineNumber = 4, TaskName = "Automation Test Collaboration", CollaborationType = "AutomationTestCollaboration", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 18.75m, Notes = "E2E coord" },
-            new() { LineNumber = 5, TaskName = "Consultant/Mentor Effort", CollaborationType = "ConsultantMentorEffort", NumberOfMeetings = 0, MeetingDurationMinutes = 0, NumberOfParticipants = 0, ParticipantPrepTimeMinutes = 0, TotalHours = 0m, Notes = "N/A" },
         }
     };
 
@@ -267,7 +261,7 @@ public static class DemoDataSeeder
         ChangeOrderId = "CO-2026-0701",
         ProjectDescription = "Complete pharmacy claims, formulary management, and PBM integration overhaul with real-time drug interaction checking.",
         EstimatedBy = "DGarcia", ReviewedBy = "SAnderson",
-        PmEffortPercentage = 15m, PmReservePercentage = 5m,
+        PmEffortPercentage = 15m,
         TotalDevelopmentHours = 2258.18m, GrandTotalHours = 3575.00m, TShirtSize = "XL3",
         CollaborationHours = 93.75m,
         DevelopmentAdjustedHours = 40m, AnalysisAdjustedHours = 10m, BusinessDesignAdjustedHours = 20m,
@@ -296,7 +290,6 @@ public static class DemoDataSeeder
             new() { LineNumber = 2, TaskName = "Client Meetings", CollaborationType = "ClientMeetings", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 18.75m, Notes = "Weekly + pharma committee" },
             new() { LineNumber = 3, TaskName = "Internal Meetings", CollaborationType = "InternalMeetings", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 18.75m, Notes = "Sprint + architecture" },
             new() { LineNumber = 4, TaskName = "Automation Test Collaboration", CollaborationType = "AutomationTestCollaboration", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 18.75m, Notes = "DUR test data" },
-            new() { LineNumber = 5, TaskName = "Consultant/Mentor Effort", CollaborationType = "ConsultantMentorEffort", NumberOfMeetings = 0, MeetingDurationMinutes = 0, NumberOfParticipants = 0, ParticipantPrepTimeMinutes = 0, TotalHours = 0m, Notes = "N/A" },
         }
     };
 
@@ -306,7 +299,7 @@ public static class DemoDataSeeder
         ChangeOrderId = "CO-2026-0815",
         ProjectDescription = "State Medicaid eligibility determination, enrollment processing, MAGI income calculation with federal hub integration.",
         EstimatedBy = "SAnderson", ReviewedBy = "BNguyen",
-        PmEffortPercentage = 15m, PmReservePercentage = 5m,
+        PmEffortPercentage = 15m,
         TotalDevelopmentHours = 3278.20m, GrandTotalHours = 4750.00m, TShirtSize = "XL4",
         CollaborationHours = 93.75m,
         DevelopmentAdjustedHours = 50m, AnalysisAdjustedHours = 15m, BusinessDesignAdjustedHours = 25m,
@@ -335,7 +328,6 @@ public static class DemoDataSeeder
             new() { LineNumber = 2, TaskName = "Client Meetings", CollaborationType = "ClientMeetings", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 18.75m, Notes = "Weekly + CMS" },
             new() { LineNumber = 3, TaskName = "Internal Meetings", CollaborationType = "InternalMeetings", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 18.75m, Notes = "Sprint + arch" },
             new() { LineNumber = 4, TaskName = "Automation Test Collaboration", CollaborationType = "AutomationTestCollaboration", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 18.75m, Notes = "Federal hub" },
-            new() { LineNumber = 5, TaskName = "Consultant/Mentor Effort", CollaborationType = "ConsultantMentorEffort", NumberOfMeetings = 0, MeetingDurationMinutes = 0, NumberOfParticipants = 0, ParticipantPrepTimeMinutes = 0, TotalHours = 0m, Notes = "N/A" },
         }
     };
 
@@ -345,7 +337,7 @@ public static class DemoDataSeeder
         ChangeOrderId = "CO-2026-0920",
         ProjectDescription = "Full DW redesign with real-time feeds, HEDIS reporting, predictive analytics, and CMS Star Ratings.",
         EstimatedBy = "BNguyen", ReviewedBy = "TReddy",
-        PmEffortPercentage = 18m, PmReservePercentage = 5m,
+        PmEffortPercentage = 18m,
         TotalDevelopmentHours = 3318.95m, GrandTotalHours = 5500.00m, TShirtSize = "XL5",
         CollaborationHours = 112.50m,
         DevelopmentAdjustedHours = 60m, AnalysisAdjustedHours = 15m, BusinessDesignAdjustedHours = 30m,
@@ -373,7 +365,6 @@ public static class DemoDataSeeder
             new() { LineNumber = 2, TaskName = "Client Meetings", CollaborationType = "ClientMeetings", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 4, ParticipantPrepTimeMinutes = 15, TotalHours = 25.00m, Notes = "Weekly + governance" },
             new() { LineNumber = 3, TaskName = "Internal Meetings", CollaborationType = "InternalMeetings", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 18.75m, Notes = "Sprint + data sync" },
             new() { LineNumber = 4, TaskName = "Automation Test Collaboration", CollaborationType = "AutomationTestCollaboration", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 18.75m, Notes = "Data quality" },
-            new() { LineNumber = 5, TaskName = "Consultant/Mentor Effort", CollaborationType = "ConsultantMentorEffort", NumberOfMeetings = 0, MeetingDurationMinutes = 0, NumberOfParticipants = 0, ParticipantPrepTimeMinutes = 0, TotalHours = 0m, Notes = "N/A" },
         }
     };
 
@@ -383,7 +374,7 @@ public static class DemoDataSeeder
         ChangeOrderId = "CO-2026-1005",
         ProjectDescription = "Consolidate 3 state Medicaid claims platforms into unified multi-tenant architecture with state configs.",
         EstimatedBy = "TReddy", ReviewedBy = "JDavis",
-        PmEffortPercentage = 18m, PmReservePercentage = 5m,
+        PmEffortPercentage = 18m,
         TotalDevelopmentHours = 4404.48m, GrandTotalHours = 6500.00m, TShirtSize = "XL6",
         CollaborationHours = 131.25m,
         DevelopmentAdjustedHours = 80m, AnalysisAdjustedHours = 20m, BusinessDesignAdjustedHours = 35m,
@@ -412,7 +403,6 @@ public static class DemoDataSeeder
             new() { LineNumber = 2, TaskName = "Client Meetings", CollaborationType = "ClientMeetings", NumberOfMeetings = 8, MeetingDurationMinutes = 60, NumberOfParticipants = 4, ParticipantPrepTimeMinutes = 15, TotalHours = 40.00m, Notes = "Per-state + cross" },
             new() { LineNumber = 3, TaskName = "Internal Meetings", CollaborationType = "InternalMeetings", NumberOfMeetings = 5, MeetingDurationMinutes = 60, NumberOfParticipants = 4, ParticipantPrepTimeMinutes = 15, TotalHours = 25.00m, Notes = "Arch + migration" },
             new() { LineNumber = 4, TaskName = "Automation Test Collaboration", CollaborationType = "AutomationTestCollaboration", NumberOfMeetings = 4, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 15.00m, Notes = "Cross-state regression" },
-            new() { LineNumber = 5, TaskName = "Consultant/Mentor Effort", CollaborationType = "ConsultantMentorEffort", NumberOfMeetings = 1, MeetingDurationMinutes = 60, NumberOfParticipants = 1, ParticipantPrepTimeMinutes = 15, TotalHours = 1.25m, Notes = "Arch review" },
         }
     };
 
@@ -422,7 +412,7 @@ public static class DemoDataSeeder
         ChangeOrderId = "CO-2026-1110",
         ProjectDescription = "Population health, care coordination, utilization management, and predictive risk scoring with HIE integration.",
         EstimatedBy = "JDavis", ReviewedBy = "CWilson",
-        PmEffortPercentage = 20m, PmReservePercentage = 5m,
+        PmEffortPercentage = 20m,
         TotalDevelopmentHours = 4757.60m, GrandTotalHours = 7250.00m, TShirtSize = "XL7",
         CollaborationHours = 150.00m,
         DevelopmentAdjustedHours = 100m, AnalysisAdjustedHours = 25m, BusinessDesignAdjustedHours = 40m,
@@ -451,7 +441,6 @@ public static class DemoDataSeeder
             new() { LineNumber = 2, TaskName = "Client Meetings", CollaborationType = "ClientMeetings", NumberOfMeetings = 8, MeetingDurationMinutes = 60, NumberOfParticipants = 4, ParticipantPrepTimeMinutes = 15, TotalHours = 40.00m, Notes = "Weekly + medical dir" },
             new() { LineNumber = 3, TaskName = "Internal Meetings", CollaborationType = "InternalMeetings", NumberOfMeetings = 6, MeetingDurationMinutes = 60, NumberOfParticipants = 4, ParticipantPrepTimeMinutes = 15, TotalHours = 30.00m, Notes = "Sprint + clinical" },
             new() { LineNumber = 4, TaskName = "Automation Test Collaboration", CollaborationType = "AutomationTestCollaboration", NumberOfMeetings = 4, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 15.00m, Notes = "Clinical scenarios" },
-            new() { LineNumber = 5, TaskName = "Consultant/Mentor Effort", CollaborationType = "ConsultantMentorEffort", NumberOfMeetings = 2, MeetingDurationMinutes = 60, NumberOfParticipants = 1, ParticipantPrepTimeMinutes = 15, TotalHours = 2.50m, Notes = "FHIR arch review" },
         }
     };
 
@@ -461,7 +450,7 @@ public static class DemoDataSeeder
         ChangeOrderId = "CO-2026-1200",
         ProjectDescription = "Complete MMIS replacement — claims, eligibility, pharmacy, financials, provider, and member services.",
         EstimatedBy = "CWilson", ReviewedBy = "JSmith",
-        PmEffortPercentage = 20m, PmReservePercentage = 5m,
+        PmEffortPercentage = 20m,
         TotalDevelopmentHours = 6510.75m, GrandTotalHours = 9800.00m, TShirtSize = "XL8",
         CollaborationHours = 187.50m,
         DevelopmentAdjustedHours = 150m, AnalysisAdjustedHours = 40m, BusinessDesignAdjustedHours = 60m,
@@ -491,7 +480,6 @@ public static class DemoDataSeeder
             new() { LineNumber = 2, TaskName = "Client Meetings", CollaborationType = "ClientMeetings", NumberOfMeetings = 10, MeetingDurationMinutes = 60, NumberOfParticipants = 5, ParticipantPrepTimeMinutes = 15, TotalHours = 62.50m, Notes = "Weekly + CMS + steering" },
             new() { LineNumber = 3, TaskName = "Internal Meetings", CollaborationType = "InternalMeetings", NumberOfMeetings = 8, MeetingDurationMinutes = 60, NumberOfParticipants = 4, ParticipantPrepTimeMinutes = 15, TotalHours = 40.00m, Notes = "Sprint + arch + integration" },
             new() { LineNumber = 4, TaskName = "Automation Test Collaboration", CollaborationType = "AutomationTestCollaboration", NumberOfMeetings = 4, MeetingDurationMinutes = 60, NumberOfParticipants = 3, ParticipantPrepTimeMinutes = 15, TotalHours = 15.00m, Notes = "CMS cert testing" },
-            new() { LineNumber = 5, TaskName = "Consultant/Mentor Effort", CollaborationType = "ConsultantMentorEffort", NumberOfMeetings = 3, MeetingDurationMinutes = 90, NumberOfParticipants = 2, ParticipantPrepTimeMinutes = 30, TotalHours = 7.50m, Notes = "IV&V reviews" },
         }
     };
 }

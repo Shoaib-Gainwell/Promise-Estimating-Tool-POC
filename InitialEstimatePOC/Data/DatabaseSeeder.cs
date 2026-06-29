@@ -8,6 +8,22 @@ public static class DatabaseSeeder
     public static void Initialize(EstimateDbContext db)
     {
         db.Database.EnsureCreated();
+
+        // Add new columns to existing databases if not present (each independently so a pre-existing column doesn't abort the rest)
+        var newCols = new[]
+        {
+            ("WPRS_ADJUSTED_HOURS", "REAL DEFAULT 0"),
+            ("CLIENT_MTG_ADJUSTED_HOURS", "REAL DEFAULT 0"),
+            ("INTERNAL_MTG_ADJUSTED_HOURS", "REAL DEFAULT 0"),
+            ("AUTO_TEST_ADJUSTED_HOURS", "REAL DEFAULT 0"),
+            ("CONSULTANT_ADJUSTED_HOURS", "REAL DEFAULT 0"),
+        };
+        foreach (var (col, def) in newCols)
+        {
+            try { db.Database.ExecuteSqlRaw($"ALTER TABLE PROJECT_ESTIMATES ADD COLUMN {col} {def}"); }
+            catch { /* column already exists — ignore */ }
+        }
+
         if (db.WeightedValues.Any()) return;
         db.WeightedValues.AddRange(GetDefaultValues());
         db.SaveChanges();

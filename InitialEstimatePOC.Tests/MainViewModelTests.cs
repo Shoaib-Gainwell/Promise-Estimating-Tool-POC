@@ -147,7 +147,7 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public void DerivedTasks_GrandTotal_IncludesPMAndReserve()
+    public void DerivedTasks_GrandTotal_IncludesPM()
     {
         var vm = CreateVm();
         // Clear default collaboration for pure derived-task validation
@@ -156,10 +156,8 @@ public class MainViewModelTests
         AddComponent(vm, ComponentType.MISC, ComponentSize.Large, ChangeType.New, 1);
 
         // Subtotal = 172 + 25.80 = 197.80
-        // PM Reserve = ROUNDUP(197.80 * 0.05, 2) = ROUNDUP(9.89, 2) = 9.89
-        // Grand Total = Math.Ceiling(197.80 + 9.89) = Math.Ceiling(207.69) = 208
-        Assert.Equal(208m, vm.GrandTotalHours);
-        Assert.Equal(9.89m, vm.PmReserveHours);
+        // Grand Total = Math.Ceiling(197.80) = 198
+        Assert.Equal(198m, vm.GrandTotalHours);
     }
 
     [Fact]
@@ -314,7 +312,6 @@ public class MainViewModelTests
         vm.EstimatedBy = "Tester";
         vm.ReviewedBy = "Reviewer";
         vm.PmEffortPercentage = 20m;
-        vm.PmReservePercentage = 10m;
         vm.DevelopmentAdjustedHours = 5m;
         vm.AnalysisAdjustedHours = 2m;
         vm.AdjustedHoursComments = "Adjusted for scope";
@@ -337,7 +334,6 @@ public class MainViewModelTests
         Assert.Empty(vm.Components);
         Assert.Equal(0m, vm.TotalDevelopmentHours);
         Assert.Equal(0m, vm.GrandTotalHours);
-        Assert.Equal(0m, vm.PmReserveHours);
         Assert.Equal(0m, vm.ProjectManagementHours);
         Assert.Equal(0, vm.ComponentCount);
         Assert.Equal("—", vm.TShirtSize);
@@ -351,7 +347,6 @@ public class MainViewModelTests
 
         // PM defaults restored
         Assert.Equal(15m, vm.PmEffortPercentage);
-        Assert.Equal(5m, vm.PmReservePercentage);
 
         // Adjusted hours cleared
         Assert.Equal(0m, vm.DevelopmentAdjustedHours);

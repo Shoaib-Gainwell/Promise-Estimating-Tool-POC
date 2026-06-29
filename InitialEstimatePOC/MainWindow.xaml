@@ -301,7 +301,6 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Orientation="Horizontal">
@@ -332,12 +331,7 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Column="4" Background="White" CornerRadius="6" Padding="16,8" VerticalAlignment="Center">
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="{Binding PmReserveHours, StringFormat='{}{0:N2} Hrs'}" FontSize="18" FontWeight="Bold" Foreground="#DC2626" HorizontalAlignment="Center" />
-                        <TextBlock Text="PM Reserve" FontSize="10" Foreground="#374151" HorizontalAlignment="Center" />
-                    </StackPanel>
-                </Border>
+
             </Grid>
         </Border>
 
@@ -677,34 +671,17 @@
                 </TabItem>
 
                 <!-- ══ TAB 2: Collaboration / Quality ══ -->
-                <TabItem Header="🤝 Collaboration">
+                <TabItem Header="🤝 Collaboration" IsEnabled="{Binding HasValidComponents}"
+                         ToolTip="Add at least one component in the Components tab to enable Collaboration.">
                     <Border Style="{StaticResource CardBorder}" Margin="0">
                         <DockPanel>
                             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,12">
                                 <TextBlock Text="Collaboration Quality" Style="{StaticResource SectionHeader}" VerticalAlignment="Center" Margin="0,0,8,0" />
                                 <TextBlock Style="{StaticResource HelpIcon}" VerticalAlignment="Center" Margin="0,0,16,0"
-                                           ToolTip="Collaboration items capture time spent in meetings, reviews, and coordination activities.&#x0a;&#x0a;Formula (matches Excel): # Meetings × (Duration/60 + Prep Time/60) × # Participants&#x0a;&#x0a;Example: 5 meetings × (60min/60 + 15min/60) × 3 participants = 18.75 hours&#x0a;&#x0a;Default rows: WPRs (10), Client Meetings (5), Internal Meetings (5), Automation Test Collaboration (5), Consultant/Mentor Effort." />
-                                <Button Content="＋ Add Item" Style="{StaticResource PrimaryButton}" 
-                                        Command="{Binding AddCollaborationItemCommand}" Margin="0,0,8,0"
-                                        ToolTip="Add a new collaboration/quality item (Ctrl+N)" />
-                                <Button Content="↶ Undo" Style="{StaticResource GhostButton}" 
-                                        Click="OnUndoClick"
-                                        ToolTip="Undo last delete (Ctrl+Z)" />
+                                           ToolTip="Collaboration items capture time spent in meetings, reviews, and coordination activities.&#x0a;&#x0a;Formula (matches Excel): # Meetings × (Duration/60 + Prep Time/60) × # Participants&#x0a;&#x0a;Example: 5 meetings × (60min/60 + 15min/60) × 3 participants = 18.75 hours" />
                             </StackPanel>
 
                             <Grid>
-                                <!-- Empty State -->
-                                <Border Background="#FAFBFC" CornerRadius="8" Padding="40" 
-                                        HorizontalAlignment="Center" VerticalAlignment="Center"
-                                        Visibility="{Binding CollaborationCount, Converter={StaticResource ZeroToVisibility}}">
-                                    <StackPanel HorizontalAlignment="Center">
-                                        <TextBlock Text="🤝" FontSize="40" HorizontalAlignment="Center" Margin="0,0,0,12" />
-                                        <TextBlock Text="No collaboration items yet" FontSize="16" FontWeight="SemiBold" 
-                                                   Foreground="#374151" HorizontalAlignment="Center" />
-                                        <TextBlock Text="Click '＋ Add Item' to add meetings, reviews, and other collaboration activities" 
-                                                   FontSize="12" Foreground="#6B7280" HorizontalAlignment="Center" Margin="0,6,0,0" />
-                                    </StackPanel>
-                                </Border>
 
                             <DataGrid x:Name="CollaborationGrid"
                                       ItemsSource="{Binding CollaborationItems}" 
@@ -772,71 +749,94 @@
 
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="#" Binding="{Binding LineNumber}" Width="35" IsReadOnly="True" />
-                                    <DataGridTextColumn Header="Task Name" Binding="{Binding TaskName, UpdateSourceTrigger=PropertyChanged}" Width="*">
-                                        <DataGridTextColumn.HeaderStyle>
-                                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-                                                <Setter Property="ToolTip" Value="Descriptive name for the collaboration activity." />
-                                            </Style>
-                                        </DataGridTextColumn.HeaderStyle>
-                                    </DataGridTextColumn>
 
-                                    <DataGridTemplateColumn Header="Type" Width="160">
-                                        <DataGridTemplateColumn.HeaderStyle>
-                                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-                                                <Setter Property="ToolTip" Value="Category:&#x0a;• WPRs — Walkthrough/Peer Reviews&#x0a;• Client Meetings&#x0a;• Internal Meetings&#x0a;• Automation Test Collaboration&#x0a;• Consultant/Mentor Effort" />
-                                            </Style>
-                                        </DataGridTemplateColumn.HeaderStyle>
+                                    <DataGridTemplateColumn Header="Type" Width="200" IsReadOnly="True">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding CollabType, Converter={StaticResource EnumDisplay}}" VerticalAlignment="Center" Padding="4,0" />
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Header="Number of Meetings / WPRs" Width="75">
+                                        <DataGridTemplateColumn.HeaderStyle>
+                                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                                <Setter Property="ToolTip" Value="Number of Meetings / WPRs" />
+                                            </Style>
+                                        </DataGridTemplateColumn.HeaderStyle>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding NumberOfMeetings}" VerticalAlignment="Center" Padding="4,0" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
                                         <DataGridTemplateColumn.CellEditingTemplate>
                                             <DataTemplate>
-                                                <ComboBox ItemsSource="{Binding DataContext.CollaborationTypes, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                          SelectedItem="{Binding CollabType, UpdateSourceTrigger=PropertyChanged}"
-                                                          IsDropDownOpen="True">
-                                                    <ComboBox.ItemTemplate>
-                                                        <DataTemplate>
-                                                            <TextBlock Text="{Binding Converter={StaticResource EnumDisplay}}" />
-                                                        </DataTemplate>
-                                                    </ComboBox.ItemTemplate>
-                                                </ComboBox>
+                                                <ComboBox ItemsSource="{Binding DataContext.MeetingCountOptions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          SelectedItem="{Binding NumberOfMeetings, UpdateSourceTrigger=PropertyChanged}"
+                                                          IsDropDownOpen="True" />
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellEditingTemplate>
                                     </DataGridTemplateColumn>
 
-                                    <DataGridTextColumn Header="Number of Meetings / WPRs" Binding="{Binding NumberOfMeetings, UpdateSourceTrigger=PropertyChanged}" Width="75">
-                                        <DataGridTextColumn.HeaderStyle>
-                                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-                                                <Setter Property="ToolTip" Value="Number of Meetings / WPRs" />
-                                            </Style>
-                                        </DataGridTextColumn.HeaderStyle>
-                                    </DataGridTextColumn>
-
-                                    <DataGridTextColumn Header="Meeting Duration (In Mins)" Binding="{Binding MeetingDurationMinutes, UpdateSourceTrigger=PropertyChanged}" Width="90">
-                                        <DataGridTextColumn.HeaderStyle>
+                                    <DataGridTemplateColumn Header="Meeting Duration (In Mins)" Width="90">
+                                        <DataGridTemplateColumn.HeaderStyle>
                                             <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                                                 <Setter Property="ToolTip" Value="Meeting Duration (In Minutes)" />
                                             </Style>
-                                        </DataGridTextColumn.HeaderStyle>
-                                    </DataGridTextColumn>
+                                        </DataGridTemplateColumn.HeaderStyle>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding MeetingDurationMinutes}" VerticalAlignment="Center" Padding="4,0" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding DataContext.MeetingDurationOptions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          SelectedItem="{Binding MeetingDurationMinutes, UpdateSourceTrigger=PropertyChanged}"
+                                                          IsDropDownOpen="True" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
 
-                                    <DataGridTextColumn Header="Number of Participants" Binding="{Binding NumberOfParticipants, UpdateSourceTrigger=PropertyChanged}" Width="85">
-                                        <DataGridTextColumn.HeaderStyle>
+                                    <DataGridTemplateColumn Header="Number of Participants" Width="85">
+                                        <DataGridTemplateColumn.HeaderStyle>
                                             <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                                                 <Setter Property="ToolTip" Value="Number of Participants attending" />
                                             </Style>
-                                        </DataGridTextColumn.HeaderStyle>
-                                    </DataGridTextColumn>
+                                        </DataGridTemplateColumn.HeaderStyle>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding NumberOfParticipants}" VerticalAlignment="Center" Padding="4,0" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding DataContext.ParticipantCountOptions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          SelectedItem="{Binding NumberOfParticipants, UpdateSourceTrigger=PropertyChanged}"
+                                                          IsDropDownOpen="True" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
 
-                                    <DataGridTextColumn Header="Participant Prep Time (In Mins)" Binding="{Binding ParticipantPrepTimeMinutes, UpdateSourceTrigger=PropertyChanged}" Width="95">
-                                        <DataGridTextColumn.HeaderStyle>
+                                    <DataGridTemplateColumn Header="Participant Prep Time (In Mins)" Width="95">
+                                        <DataGridTemplateColumn.HeaderStyle>
                                             <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                                                 <Setter Property="ToolTip" Value="Participant Prep Time (In Minutes) — time each participant spends preparing before the meeting" />
                                             </Style>
-                                        </DataGridTextColumn.HeaderStyle>
-                                    </DataGridTextColumn>
+                                        </DataGridTemplateColumn.HeaderStyle>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding ParticipantPrepTimeMinutes}" VerticalAlignment="Center" Padding="4,0" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding DataContext.PrepTimeOptions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          SelectedItem="{Binding ParticipantPrepTimeMinutes, UpdateSourceTrigger=PropertyChanged}"
+                                                          IsDropDownOpen="True" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
 
                                     <DataGridTextColumn Header="Total" Binding="{Binding TotalHours, StringFormat=N2}" Width="75" IsReadOnly="True">
                                         <DataGridTextColumn.HeaderStyle>
@@ -848,16 +848,7 @@
 
                                     <DataGridTextColumn Header="Notes" Binding="{Binding Notes, UpdateSourceTrigger=PropertyChanged}" Width="120" />
 
-                                    <DataGridTemplateColumn Header="" Width="35">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Button Content="✕" FontSize="12" Foreground="#EF4444" Background="Transparent" BorderThickness="0" Cursor="Hand"
-                                                        Click="OnDeleteCollaborationClick"
-                                                        VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                        ToolTip="Remove this item (can undo with Ctrl+Z)" />
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
+
                                 </DataGrid.Columns>
                             </DataGrid>
                             </Grid>
@@ -907,7 +898,7 @@
                                                            ToolTip="Sum of all component hours from the Components tab." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding TotalDevelopmentHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding DevelopmentAdjustedHours, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
+                                            <TextBox Grid.Column="2" Text="{Binding DevelopmentAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding DevelopmentTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -928,7 +919,7 @@
                                                            ToolTip="Default: 5% of (Development + System Testing). Some analysis hours are included in Development." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding AnalysisHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding AnalysisAdjustedHours, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
+                                            <TextBox Grid.Column="2" Text="{Binding AnalysisAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding AnalysisTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -949,7 +940,7 @@
                                                            ToolTip="Default: 15% of (Development + System Testing). Tech Design is covered under Development." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding BusinessDesignHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding BusinessDesignAdjustedHours, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
+                                            <TextBox Grid.Column="2" Text="{Binding BusinessDesignAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding BusinessDesignTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -970,7 +961,7 @@
                                                            ToolTip="Default: 30% of Development. Test Automation effort should be selected under Development as 'Test Automation Suites (UFT)'." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding SystemTestingHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding SystemTestingAdjustedHours, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
+                                            <TextBox Grid.Column="2" Text="{Binding SystemTestingAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding SystemTestingTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -991,7 +982,7 @@
                                                            ToolTip="Default: 5% of Development. Includes Dev, Model, E2E, UAT, Prod &amp; Training Environment promotion and System Documentation." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding PromotionHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding PromotionAdjustedHours, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
+                                            <TextBox Grid.Column="2" Text="{Binding PromotionAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding PromotionTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1012,7 +1003,7 @@
                                                            ToolTip="Default: 5% of Development. BA System Documentation and Communication Plan." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding BaSystemDocHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding BaSystemDocAdjustedHours, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
+                                            <TextBox Grid.Column="2" Text="{Binding BaSystemDocAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding BaSystemDocTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1033,7 +1024,7 @@
                                                            ToolTip="Default: 20% of System Testing. Includes time for documenting System Documentation." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding ProductionValidationHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding ProductionValidationAdjustedHours, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
+                                            <TextBox Grid.Column="2" Text="{Binding ProductionValidationAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding ProductionValidationTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1054,13 +1045,118 @@
                                                            ToolTip="Default: PM% of overall effort (Development + all derived tasks). Change the percentage in Project Settings." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding ProjectManagementHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding ProjectManagementAdjustedHours, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
+                                            <TextBox Grid.Column="2" Text="{Binding ProjectManagementAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding ProjectManagementTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
                                     </Border>
 
-                                    <!-- Row: Collaboration -->
+                                    <!-- Row: Collaboration — WPRs -->
+                                    <Border BorderBrush="#F3F4F6" BorderThickness="0,0,0,1" Padding="0,4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2.5*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="WPRs" FontSize="12" FontWeight="Medium" Foreground="#1A1A2E" Padding="8,4" />
+                                                <TextBlock Style="{StaticResource HelpIcon}" FontSize="11"
+                                                           ToolTip="10 WPRs — BRD (if applicable), Initial Estimate, BDD, Detailed Estimate, TDD, Code, Test Plan, Test Results, System Documentation and Production Validation.&#x0a;&#x0a;To make a Change → Select Number of WPRs, Meeting Duration, Number of Participants and Prep Time per Participant in the Collaboration tab." />
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="{Binding WprsHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
+                                            <TextBox Grid.Column="2" Text="{Binding WprsAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}"
+                                                     Style="{StaticResource NumericTextBox}" Margin="4,2" />
+                                            <TextBlock Grid.Column="3" Text="{Binding WprsTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Row: Collaboration — Client Meetings -->
+                                    <Border BorderBrush="#F3F4F6" BorderThickness="0,0,0,1" Padding="0,4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2.5*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="Client Meetings" FontSize="12" FontWeight="Medium" Foreground="#1A1A2E" Padding="8,4" />
+                                                <TextBlock Style="{StaticResource HelpIcon}" FontSize="11"
+                                                           ToolTip="5 meetings with an average of 3 participants, with 15 mins of prep time for each participant yields 18.75 hours.&#x0a;&#x0a;To make a Change → Provide Number of meetings, Meeting Duration, Number of Participants and Prep Time per Participant in the Collaboration tab." />
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="{Binding ClientMeetingsHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
+                                            <TextBox Grid.Column="2" Text="{Binding ClientMeetingsAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}"
+                                                     Style="{StaticResource NumericTextBox}" Margin="4,2" />
+                                            <TextBlock Grid.Column="3" Text="{Binding ClientMeetingsTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Row: Collaboration — Internal Meetings -->
+                                    <Border BorderBrush="#F3F4F6" BorderThickness="0,0,0,1" Padding="0,4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2.5*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="Internal Meetings" FontSize="12" FontWeight="Medium" Foreground="#1A1A2E" Padding="8,4" />
+                                                <TextBlock Style="{StaticResource HelpIcon}" FontSize="11"
+                                                           ToolTip="5 meetings with an average of 3 participants, with 15 mins of prep time for each participant yields 18.75 hours.&#x0a;&#x0a;To make a Change → Provide Number of meetings, Meeting Duration, Number of Participants and Prep Time per Participant in the Collaboration tab." />
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="{Binding InternalMeetingsHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
+                                            <TextBox Grid.Column="2" Text="{Binding InternalMeetingsAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}"
+                                                     Style="{StaticResource NumericTextBox}" Margin="4,2" />
+                                            <TextBlock Grid.Column="3" Text="{Binding InternalMeetingsTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Row: Collaboration — Automation Test Collaboration -->
+                                    <Border BorderBrush="#F3F4F6" BorderThickness="0,0,0,1" Padding="0,4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2.5*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="Automation Test Collaboration" FontSize="12" FontWeight="Medium" Foreground="#1A1A2E" Padding="8,4" />
+                                                <TextBlock Style="{StaticResource HelpIcon}" FontSize="11"
+                                                           ToolTip="5 meetings with an average of 3 participants, with 15 mins of prep time for each participant yields 18.75 hours.&#x0a;&#x0a;To make a Change → Provide Number of meetings, Meeting Duration, Number of Participants and Prep Time per Participant in the Collaboration tab." />
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="{Binding AutomationTestCollabHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
+                                            <TextBox Grid.Column="2" Text="{Binding AutomationTestCollabAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}"
+                                                     Style="{StaticResource NumericTextBox}" Margin="4,2" />
+                                            <TextBlock Grid.Column="3" Text="{Binding AutomationTestCollabTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Row: Consultant / Mentor Effort (standalone adjustment) -->
+                                    <Border BorderBrush="#F3F4F6" BorderThickness="0,0,0,1" Padding="0,4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2.5*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="Consultant / Mentor Effort" FontSize="12" FontWeight="Medium" Foreground="#1A1A2E" Padding="8,4" />
+                                                <TextBlock Style="{StaticResource HelpIcon}" FontSize="11"
+                                                           ToolTip="Insert hours for Consultant and Mentors." />
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="0.00" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
+                                            <TextBox Grid.Column="2" Text="{Binding ConsultantMentorAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}"
+                                                     Style="{StaticResource NumericTextBox}" Margin="4,2" />
+                                            <TextBlock Grid.Column="3" Text="{Binding ConsultantMentorTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Row: Collaboration & Quality — Grand Total -->
                                     <Border BorderBrush="#E5E7EB" BorderThickness="0,0,0,2" Padding="0,4" Background="#FAFBFC">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
@@ -1070,13 +1166,12 @@
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                                                <TextBlock Text="Collaboration &amp; Quality" FontSize="12" FontWeight="Medium" Foreground="#1A1A2E" Padding="8,4" />
+                                                <TextBlock Text="Collaboration &amp; Quality (Total)" FontSize="12" FontWeight="Medium" Foreground="#1A1A2E" Padding="8,4" />
                                                 <TextBlock Style="{StaticResource HelpIcon}" FontSize="11"
-                                                           ToolTip="Sum of all collaboration items from the Collaboration tab (WPRs, Client Meetings, Internal Meetings, etc.)." />
+                                                           ToolTip="Sum of all collaboration type totals (Calculated + Adjusted):&#x0a;• WPRs&#x0a;• Client Meetings&#x0a;• Internal Meetings&#x0a;• Automation Test Collaboration&#x0a;• Consultant / Mentor Effort" />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding TotalCollaborationHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding CollaborationAdjustedHours, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
-                                                     Style="{StaticResource NumericTextBox}" Margin="4,2" />
+                                            <TextBlock Grid.Column="2" FontSize="12" Foreground="#D1D5DB" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" Text="—" />
                                             <TextBlock Grid.Column="3" Text="{Binding CollaborationTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
                                     </Border>
@@ -1179,59 +1274,6 @@
                                 </StackPanel>
                             </Border>
 
-                            <!-- Assumptions Card -->
-                            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,0">
-                                <StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                                        <TextBlock Text="Assumptions &amp; Notes" Style="{StaticResource SectionHeader}" />
-                                        <TextBlock Style="{StaticResource HelpIcon}"
-                                                   ToolTip="Document all assumptions made during this estimate. This is critical for:&#x0a;• Audit trail — explains why certain choices were made&#x0a;• Risk visibility — highlights what could change&#x0a;• Reviewer context — helps approvers understand the estimate&#x0a;&#x0a;Example assumptions: 'Assumes existing database schema unchanged', 'Assumes 2 rounds of UAT only', 'No after-hours deployments'" />
-                                    </StackPanel>
-
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-
-                                        <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,8,12">
-                                            <TextBlock Text="SE / Development Assumptions" Style="{StaticResource FieldLabel}" />
-                                            <TextBox Text="{Binding SeAssumptions, UpdateSourceTrigger=PropertyChanged}" 
-                                                     Padding="8,6" FontSize="12" AcceptsReturn="True" TextWrapping="Wrap" 
-                                                     Height="80" VerticalScrollBarVisibility="Auto"
-                                                     ToolTip="Assumptions about development work. E.g., 'Developer proficient in PowerBuilder', 'Existing framework reusable'" />
-                                        </StackPanel>
-
-                                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="8,0,0,12">
-                                            <TextBlock Text="BA / Testing Assumptions" Style="{StaticResource FieldLabel}" />
-                                            <TextBox Text="{Binding BaAssumptions, UpdateSourceTrigger=PropertyChanged}" 
-                                                     Padding="8,6" FontSize="12" AcceptsReturn="True" TextWrapping="Wrap" 
-                                                     Height="80" VerticalScrollBarVisibility="Auto"
-                                                     ToolTip="Assumptions about BA/testing. E.g., 'Requirements 80% complete', '2 UAT cycles', 'No regression test automation'" />
-                                        </StackPanel>
-
-                                        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,8,0">
-                                            <TextBlock Text="Collaboration Assumptions" Style="{StaticResource FieldLabel}" />
-                                            <TextBox Text="{Binding CollaborationAssumptions, UpdateSourceTrigger=PropertyChanged}" 
-                                                     Padding="8,6" FontSize="12" AcceptsReturn="True" TextWrapping="Wrap" 
-                                                     Height="80" VerticalScrollBarVisibility="Auto"
-                                                     ToolTip="Assumptions about meetings/reviews. E.g., 'Client available for weekly 1hr meetings', 'WPR for all code changes'" />
-                                        </StackPanel>
-
-                                        <StackPanel Grid.Row="1" Grid.Column="1" Margin="8,0,0,0">
-                                            <TextBlock Text="General Assumptions / Risks" Style="{StaticResource FieldLabel}" />
-                                            <TextBox Text="{Binding GeneralAssumptions, UpdateSourceTrigger=PropertyChanged}" 
-                                                     Padding="8,6" FontSize="12" AcceptsReturn="True" TextWrapping="Wrap" 
-                                                     Height="80" VerticalScrollBarVisibility="Auto"
-                                                     ToolTip="Overall assumptions and risks. E.g., 'No scope changes after approval', 'Environment available on time', 'No after-hours deployments'" />
-                                        </StackPanel>
-                                    </Grid>
-                                </StackPanel>
-                            </Border>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
@@ -1375,24 +1417,6 @@
                                 <TextBlock Grid.Column="1" Text="{Binding SubtotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" FontWeight="SemiBold" Foreground="#374151" />
                             </Grid>
 
-                            <!-- PM Reserve -->
-                            <Grid Margin="0,4">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="50" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="PM Reserve" Foreground="#DC2626" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"
-                                           ToolTip="Contingency buffer for unknowns and risks. Applied AFTER all hours are summed. NOT assignable to a role — it's a safety margin. Standard is 5%." />
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBox Text="{Binding PmReservePercentage, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
-                                             Width="35" FontSize="11" Padding="4,2" HorizontalContentAlignment="Center"
-                                             ToolTip="PM Reserve percentage (default 5%). This is a contingency buffer, separate from PM Effort." />
-                                    <TextBlock Text="%" FontSize="11" Foreground="#6B7280" VerticalAlignment="Center" Margin="2,0,0,0" />
-                                </StackPanel>
-                                <TextBlock Grid.Column="2" Text="{Binding PmReserveHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#DC2626" FontWeight="SemiBold" />
-                            </Grid>
-
                             <Separator Margin="0,8" />
 
                             <!-- Grand Total -->
@@ -1401,10 +1425,10 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Total Estimated Hours" FontWeight="Bold" Foreground="#1A1A2E" FontSize="13"
-                                           ToolTip="Final estimate = Subtotal + PM Reserve. This is the number used for T-Shirt sizing and resource planning." />
+                                <TextBlock Text="Total Estimated Hours" FontWeight="SemiBold" Foreground="#374151" FontSize="12"
+                                           ToolTip="Final estimate = Subtotal rounded to whole number (ROUNDUP). This is the number used for T-Shirt sizing and resource planning." />
                                 <TextBlock Grid.Column="1" Text="{Binding GrandTotalHours, StringFormat={}{0:N2} Hrs}" 
-                                           FontFamily="Cascadia Mono, Consolas" FontSize="16" FontWeight="Bold" Foreground="#6C63FF" />
+                                           FontFamily="Cascadia Mono, Consolas" FontSize="13" FontWeight="SemiBold" Foreground="#374151" />
                             </Grid>
                         </StackPanel>
                     </Border>

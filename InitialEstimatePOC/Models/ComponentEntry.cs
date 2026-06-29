@@ -18,6 +18,7 @@ public class ComponentEntry
 
 public enum ComponentType
 {
+    None = -1,
     PowerBuilderWindows,
     Reports,
     ProgramsDBStoredProcs,
@@ -33,12 +34,14 @@ public enum ComponentType
 
 public enum ChangeType
 {
+    None = -1,
     New,
     Change
 }
 
 public enum ComponentSize
 {
+    None = -1,
     Small,
     Medium,
     Large
@@ -49,6 +52,5 @@ public enum CollaborationType
     WPRs,
     ClientMeetings,
     InternalMeetings,
-    AutomationTestCollaboration,
-    ConsultantMentorEffort
+    AutomationTestCollaboration
 }

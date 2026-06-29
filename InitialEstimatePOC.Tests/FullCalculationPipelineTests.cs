@@ -135,11 +135,8 @@ public class FullCalculationPipelineTests
         decimal expectedSubtotal = 953.10m + 285.93m + 61.96m + 185.86m + 47.66m + 47.66m + 57.19m + 245.91m;
         Assert.Equal(expectedSubtotal, vm.SubtotalHours);
 
-        // PM Reserve = ROUNDUP(1885.27 × 0.05, 2) = ROUNDUP(94.2635, 2) = 94.27
-        Assert.Equal(MainViewModel.RoundUp(expectedSubtotal * 0.05m), vm.PmReserveHours);
-
-        // Grand Total = Math.Ceiling(1885.27 + 94.27) = 1980
-        Assert.Equal(Math.Ceiling(expectedSubtotal + vm.PmReserveHours), vm.GrandTotalHours);
+        // Grand Total = Math.Ceiling(1885.27) = 1886
+        Assert.Equal(Math.Ceiling(expectedSubtotal), vm.GrandTotalHours);
 
         // T-Shirt = XL1 (1000-1999)
         Assert.Equal("XL1", vm.TShirtSize);

@@ -335,7 +335,7 @@ public class NewFeaturesTests
     }
 
     [Fact]
-    public void TimeForEstimates_WithPmReserve_AppliesCorrectly()
+    public void TimeForEstimates_ComponentPresentAffectsGrandTotal()
     {
         var vm = CreateVm();
         vm.AddComponentCommand.Execute(null);
@@ -343,11 +343,10 @@ public class NewFeaturesTests
         vm.Components[0].Size = ComponentSize.Small;
         vm.Components[0].ChangeType = ChangeType.New;
         vm.Components[0].Count = 1;
-        vm.PmReservePercentage = 10m;
         vm.TimeForEstimates = 100m;
-        // With component present, PM Reserve and Grand Total are calculated
-        Assert.True(vm.PmReserveHours > 0m);
-        Assert.Equal(Math.Ceiling(vm.SubtotalHours + vm.PmReserveHours), vm.GrandTotalHours);
+        // With component present, Grand Total is ceiling of SubtotalHours
+        Assert.True(vm.GrandTotalHours > 0m);
+        Assert.Equal(Math.Ceiling(vm.SubtotalHours), vm.GrandTotalHours);
     }
 
     #endregion
@@ -613,7 +612,6 @@ public class NewFeaturesTests
     public void GrandTotal_IncludesAllNewFields()
     {
         var vm = CreateVm();
-        vm.PmReservePercentage = 0; // Disable PM Reserve for easy calculation
         vm.PmEffortPercentage = 0; // Disable PM Effort
         vm.AddComponentCommand.Execute(null);
         vm.Components[0].ComponentType = ComponentType.MISC;
@@ -625,7 +623,7 @@ public class NewFeaturesTests
         vm.TimeForEstimates = 5m;
         // Subtotal = devSubtotal + actual (10) + timeEst (5)
         Assert.Equal(devSubtotal + 15m, vm.SubtotalHours);
-        Assert.Equal(Math.Ceiling(vm.SubtotalHours), vm.GrandTotalHours); // 0% reserve
+        Assert.Equal(Math.Ceiling(vm.SubtotalHours), vm.GrandTotalHours);
     }
 
     [Fact]
@@ -633,7 +631,6 @@ public class NewFeaturesTests
     {
         var vm = CreateVm();
         vm.PmEffortPercentage = 0;
-        vm.PmReservePercentage = 0;
         AddComponent(vm, ComponentType.Webpage, ComponentSize.Small, ChangeType.New, 1);
         decimal dev = vm.TotalDevelopmentHours;
 

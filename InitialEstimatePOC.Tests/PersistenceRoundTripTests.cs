@@ -169,7 +169,6 @@ public class PersistenceRoundTripTests
         {
             ProjectName = "Test",
             PmEffortPercentage = 20m,
-            PmReservePercentage = 10m,
             Components = new List<ComponentEntryEntity>(),
             CollaborationItems = new List<CollaborationItemEntity>()
         };
@@ -178,7 +177,6 @@ public class PersistenceRoundTripTests
         vm.LoadProject(entity);
 
         Assert.Equal(20m, vm.PmEffortPercentage);
-        Assert.Equal(10m, vm.PmReservePercentage);
     }
 
     #endregion
