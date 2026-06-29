@@ -302,6 +302,62 @@ public class MainViewModelTests
         Assert.Single(vm.Components);
     }
 
+    #endregion
+
+    #region Tab Enable/Disable Validation (HasComponents)
+
+    [Fact]
+    public void HasComponents_InitiallyFalse_WhenNoComponentsAdded()
+    {
+        var vm = CreateVm();
+        Assert.False(vm.HasComponents);
+    }
+
+    [Fact]
+    public void HasComponents_TrueAfterAddingComponent()
+    {
+        var vm = CreateVm();
+        vm.AddComponentCommand.Execute(null);
+        Assert.True(vm.HasComponents);
+    }
+
+    [Fact]
+    public void HasComponents_FalseAfterRemovingAllComponents()
+    {
+        var vm = CreateVm();
+        vm.AddComponentCommand.Execute(null);
+        Assert.True(vm.HasComponents);
+
+        vm.RemoveComponentCommand.Execute(vm.Components[0]);
+        Assert.False(vm.HasComponents);
+    }
+
+    [Fact]
+    public void HasComponents_FalseAfterClearAll()
+    {
+        var vm = CreateVm();
+        AddComponent(vm, ComponentType.Reports, ComponentSize.Small, ChangeType.New, 1);
+        Assert.True(vm.HasComponents);
+
+        vm.ClearAllCommand.Execute(null);
+        Assert.False(vm.HasComponents);
+    }
+
+    [Fact]
+    public void HasComponents_TrueEvenWithIncompleteComponent()
+    {
+        // Tabs should be enabled even if the component row is not fully filled out
+        var vm = CreateVm();
+        vm.AddComponentCommand.Execute(null);
+        // Row exists but has no type/size set — still counts as "has components"
+        Assert.True(vm.HasComponents);
+        Assert.False(vm.HasValidComponents); // stricter check still false
+    }
+
+    #endregion
+
+    #region ClearAll Command
+
     [Fact]
     public void ClearAll_RemovesAllComponents()
     {
@@ -365,7 +421,7 @@ public class MainViewModelTests
         Assert.Equal(0, vm.TestCasesMedium);
         Assert.Equal(0, vm.TestCasesComplex);
         Assert.Equal(0, vm.TestCasesVeryComplex);
-        Assert.Equal(1, vm.TestCaseIterations);
+        Assert.Equal(0, vm.TestCaseIterations);
     }
 
     #endregion

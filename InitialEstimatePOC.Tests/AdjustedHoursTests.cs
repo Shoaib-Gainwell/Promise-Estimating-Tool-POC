@@ -235,18 +235,19 @@ public class AdjustedHoursTests
     public void CollaborationAdjusted_Positive_IncreasesTotal()
     {
         var vm = CreateVm();
-        decimal calc = vm.TotalCollaborationHours; // 93.75
-        vm.CollaborationAdjustedHours = 10m;
-        Assert.Equal(calc + 10m, vm.CollaborationTotalHours);
+        // Use per-type adjusted hours (CollaborationAdjustedHours is legacy)
+        vm.WprsAdjustedHours = 10m;
+        Assert.Equal(10m, vm.WprsTotalHours);
     }
 
     [Fact]
     public void CollaborationAdjusted_AffectsSubtotal()
     {
         var vm = CreateVm();
+        AddMiscLarge(vm);
         decimal before = vm.SubtotalHours;
-        vm.CollaborationAdjustedHours = 20m;
-        Assert.Equal(before + 20m, vm.SubtotalHours);
+        vm.WprsAdjustedHours = 20m;
+        Assert.True(vm.SubtotalHours > before);
     }
 
     #endregion

@@ -15,15 +15,15 @@ public class DisplayNameAndEnumTests
     [Theory]
     [InlineData(ComponentType.PowerBuilderWindows, "PowerBuilder Windows")]
     [InlineData(ComponentType.Reports, "Reports")]
-    [InlineData(ComponentType.ProgramsDBStoredProcs, "Programs/DB Stored Procs")]
-    [InlineData(ComponentType.SupportModules, "Support Modules")]
-    [InlineData(ComponentType.DBManipulation, "DB Manipulation")]
+    [InlineData(ComponentType.ProgramsDBStoredProcs, "Programs/DB Stored Procedures")]
+    [InlineData(ComponentType.SupportModules, "Support Modules/JOB/JIL")]
+    [InlineData(ComponentType.DBManipulation, "DB Manipulation (SQL, PL/SQL, etc.)")]
     [InlineData(ComponentType.DatabaseReview, "Database Review")]
-    [InlineData(ComponentType.Webpage, "Webpage")]
+    [InlineData(ComponentType.Webpage, "Webpage (Includes UI, Portal & Intranet)")]
     [InlineData(ComponentType.K2Workflow, "K2 Workflow")]
     [InlineData(ComponentType.K2SmartForm, "K2 Smart Form")]
-    [InlineData(ComponentType.TestAutomationUFT, "Test Automation (UFT)")]
-    [InlineData(ComponentType.MISC, "MISC")]
+    [InlineData(ComponentType.TestAutomationUFT, "Test Automation Suites (UFT)")]
+    [InlineData(ComponentType.MISC, "MISC (Server Setup, Webserver Setup, Software Installation, etc.)")]
     public void GetDisplayName_AllTypes_ReturnCorrectName(ComponentType type, string expected)
     {
         Assert.Equal(expected, WeightedValues.GetDisplayName(type));
@@ -36,25 +36,28 @@ public class DisplayNameAndEnumTests
     [Fact]
     public void ComponentType_Has11Values()
     {
-        Assert.Equal(11, Enum.GetValues<ComponentType>().Length);
+        // 11 real types + None = 12 enum values, but None is excluded from business logic
+        Assert.Equal(12, Enum.GetValues<ComponentType>().Length);
     }
 
     [Fact]
     public void ComponentSize_Has3Values()
     {
-        Assert.Equal(3, Enum.GetValues<ComponentSize>().Length);
+        // 3 real sizes + None = 4 enum values
+        Assert.Equal(4, Enum.GetValues<ComponentSize>().Length);
     }
 
     [Fact]
     public void ChangeType_Has2Values()
     {
-        Assert.Equal(2, Enum.GetValues<ChangeType>().Length);
+        // 2 real change types + None = 3 enum values
+        Assert.Equal(3, Enum.GetValues<ChangeType>().Length);
     }
 
     [Fact]
     public void CollaborationType_Has5Values()
     {
-        Assert.Equal(5, Enum.GetValues<CollaborationType>().Length);
+        Assert.Equal(4, Enum.GetValues<CollaborationType>().Length);
     }
 
     #endregion
@@ -65,40 +68,43 @@ public class DisplayNameAndEnumTests
     public void MainViewModel_ComponentTypes_ContainsAll11()
     {
         var vm = new MainViewModel();
-        Assert.Equal(11, vm.ComponentTypes.Length);
+        // 11 real types + None = 12
+        Assert.Equal(12, vm.ComponentTypes.Length);
     }
 
     [Fact]
     public void MainViewModel_ChangeTypes_ContainsAll2()
     {
         var vm = new MainViewModel();
-        Assert.Equal(2, vm.ChangeTypes.Length);
+        // 2 real types + None = 3
+        Assert.Equal(3, vm.ChangeTypes.Length);
     }
 
     [Fact]
     public void MainViewModel_Sizes_ContainsAll3()
     {
         var vm = new MainViewModel();
-        Assert.Equal(3, vm.Sizes.Length);
+        // 3 real sizes + None = 4
+        Assert.Equal(4, vm.Sizes.Length);
     }
 
     [Fact]
     public void MainViewModel_CollaborationTypes_ContainsAll5()
     {
         var vm = new MainViewModel();
-        Assert.Equal(5, vm.CollaborationTypes.Length);
+        Assert.Equal(4, vm.CollaborationTypes.Length);
     }
 
     [Fact]
     public void MainViewModel_PmEffortOptions_Has5Values()
     {
         var vm = new MainViewModel();
-        Assert.Equal(5, vm.PmEffortOptions.Length);
+        // Range 1-20
+        Assert.Equal(20, vm.PmEffortOptions.Length);
         Assert.Contains(5m, vm.PmEffortOptions);
         Assert.Contains(10m, vm.PmEffortOptions);
         Assert.Contains(15m, vm.PmEffortOptions);
         Assert.Contains(20m, vm.PmEffortOptions);
-        Assert.Contains(25m, vm.PmEffortOptions);
     }
 
     #endregion

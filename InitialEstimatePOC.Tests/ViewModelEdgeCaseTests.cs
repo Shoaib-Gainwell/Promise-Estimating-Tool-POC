@@ -60,11 +60,11 @@ public class ViewModelEdgeCaseTests
 
         Assert.Equal(0, row.LineNumber);
         Assert.Equal(string.Empty, row.RequirementId);
-        Assert.Equal(ComponentType.PowerBuilderWindows, row.ComponentType);
+        Assert.Equal(ComponentType.None, row.ComponentType);
         Assert.Equal(string.Empty, row.Description);
-        Assert.Equal(ChangeType.New, row.ChangeType);
-        Assert.Equal(ComponentSize.Small, row.Size);
-        Assert.Equal(1, row.Count);
+        Assert.Equal(ChangeType.None, row.ChangeType);
+        Assert.Equal(ComponentSize.None, row.Size);
+        Assert.Equal(0, row.Count);
     }
 
     [Fact]
@@ -190,6 +190,7 @@ public class ViewModelEdgeCaseTests
         vm.Components[0].ComponentType = ComponentType.MISC;
         vm.Components[0].Size = ComponentSize.Large;
         vm.Components[0].ChangeType = ChangeType.New;
+        vm.Components[0].Count = 1;
 
         var pmBefore = vm.ProjectManagementHours;
         vm.PmEffortPercentage = 30m;
@@ -257,6 +258,7 @@ public class ViewModelEdgeCaseTests
         vm.Components[0].ComponentType = ComponentType.MISC;
         vm.Components[0].Size = ComponentSize.Large;
         vm.Components[0].ChangeType = ChangeType.New;
+        vm.Components[0].Count = 1;
         Assert.True(vm.GrandTotalHours > 0);
 
         vm.ClearAllCommand.Execute(null);
@@ -434,19 +436,19 @@ public class ViewModelEdgeCaseTests
     [Fact]
     public void ComponentType_Has11Values()
     {
-        Assert.Equal(11, Enum.GetValues<ComponentType>().Length);
+        Assert.Equal(12, Enum.GetValues<ComponentType>().Length);
     }
 
     [Fact]
     public void ChangeType_Has2Values()
     {
-        Assert.Equal(2, Enum.GetValues<ChangeType>().Length);
+        Assert.Equal(3, Enum.GetValues<ChangeType>().Length);
     }
 
     [Fact]
     public void ComponentSize_Has3Values()
     {
-        Assert.Equal(3, Enum.GetValues<ComponentSize>().Length);
+        Assert.Equal(4, Enum.GetValues<ComponentSize>().Length);
     }
 
     #endregion

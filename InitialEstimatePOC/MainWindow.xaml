@@ -428,7 +428,7 @@
                                 <TextBlock Style="{StaticResource HelpIcon}" VerticalAlignment="Center" Margin="0,0,16,0"
                                            ToolTip="List every software component that needs to be built or changed. Each row represents one type of work. The system looks up base hours from the weighted values table and multiplies by count.&#x0a;&#x0a;• Component Type: What kind of artifact (window, report, program, etc.)&#x0a;• Size: Complexity level (Small=simple, Medium=moderate, Large=complex)&#x0a;• New/Change: Building from scratch vs. modifying existing&#x0a;• Count: How many of this exact type/size/change combination" />
                                 <Button Content="＋ Add Component" Style="{StaticResource PrimaryButton}" 
-                                        Command="{Binding AddComponentCommand}" Margin="0,0,8,0" 
+                                        Click="OnAddComponentClick" Margin="0,0,8,0" 
                                         ToolTip="Add a new component row (Ctrl+N)" />
                                 <Button Content="💾 Save" Style="{StaticResource PrimaryButton}" 
                                         Click="OnSaveClick" Margin="0,0,8,0"
@@ -857,7 +857,8 @@
                 </TabItem>
 
                 <!-- ══ TAB 3: Adjusted Hours & Assumptions ══ -->
-                <TabItem Header="📝 Adjustments &amp; Assumptions">
+                <TabItem Header="📝 Adjustments &amp; Assumptions" IsEnabled="{Binding HasValidComponents}"
+                         ToolTip="Add at least one component in the Components tab to enable Adjustments.">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel>
                             <!-- Adjusted Hours Breakdown Card -->
@@ -1314,7 +1315,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Development" Foreground="#374151" FontSize="12" ToolTip="Sum of all component hours (Base Hrs × Count for each row)" />
-                                <TextBlock Grid.Column="1" Text="{Binding TotalDevelopmentHours, StringFormat={}{0:N2} Hrs}" 
+                                <TextBlock Grid.Column="1" Text="{Binding DevelopmentTotalHours, StringFormat={}{0:N2} Hrs}" 
                                            Style="{StaticResource KpiValue}" FontSize="13" />
                             </Grid>
 
@@ -1324,7 +1325,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="System Testing (30%)" Foreground="#374151" FontSize="12" ToolTip="ROUNDUP(Development × 30%, 2) — Standard testing effort based on dev complexity" />
-                                <TextBlock Grid.Column="1" Text="{Binding SystemTestingHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
+                                <TextBlock Grid.Column="1" Text="{Binding SystemTestingTotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
                             </Grid>
 
                             <Grid Margin="0,4">
@@ -1333,7 +1334,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Analysis (5%)" Foreground="#374151" FontSize="12" ToolTip="ROUNDUP((Development + System Testing) × 5%, 2) — Requirements analysis effort" />
-                                <TextBlock Grid.Column="1" Text="{Binding AnalysisHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
+                                <TextBlock Grid.Column="1" Text="{Binding AnalysisTotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
                             </Grid>
 
                             <Grid Margin="0,4">
@@ -1342,7 +1343,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Business Design (15%)" Foreground="#374151" FontSize="12" ToolTip="ROUNDUP((Development + System Testing) × 15%, 2) — Business requirements and design documentation" />
-                                <TextBlock Grid.Column="1" Text="{Binding BusinessDesignHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
+                                <TextBlock Grid.Column="1" Text="{Binding BusinessDesignTotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
                             </Grid>
 
                             <Grid Margin="0,4">
@@ -1351,7 +1352,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Promotion (5%)" Foreground="#374151" FontSize="12" ToolTip="ROUNDUP(Development × 5%, 2) — Code promotion/deployment to environments" />
-                                <TextBlock Grid.Column="1" Text="{Binding PromotionHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
+                                <TextBlock Grid.Column="1" Text="{Binding PromotionTotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
                             </Grid>
 
                             <Grid Margin="0,4">
@@ -1360,7 +1361,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="BA System Documentation (5%)" Foreground="#374151" FontSize="12" ToolTip="ROUNDUP(Development × 5%, 2) — BA system documentation effort" />
-                                <TextBlock Grid.Column="1" Text="{Binding BaSystemDocHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
+                                <TextBlock Grid.Column="1" Text="{Binding BaSystemDocTotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
                             </Grid>
 
                             <Grid Margin="0,4">
@@ -1369,7 +1370,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Production Validation (20%)" Foreground="#374151" FontSize="12" ToolTip="ROUNDUP(System Testing × 20%, 2) — Production validation/verification after deployment" />
-                                <TextBlock Grid.Column="1" Text="{Binding ProductionValidationHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
+                                <TextBlock Grid.Column="1" Text="{Binding ProductionValidationTotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
                             </Grid>
 
                             <Separator Margin="0,8" />
@@ -1390,7 +1391,7 @@
                                               ToolTip="Select Project Management Effort % (default 15%)" />
                                     <TextBlock Text="%" FontSize="11" Foreground="#6B7280" VerticalAlignment="Center" Margin="2,0,0,0" />
                                 </StackPanel>
-                                <TextBlock Grid.Column="2" Text="{Binding ProjectManagementHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#DC2626" />
+                                <TextBlock Grid.Column="2" Text="{Binding ProjectManagementTotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#DC2626" />
                             </Grid>
 
                             <!-- Collaboration Total -->
@@ -1401,7 +1402,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Collaboration" Foreground="#374151" FontSize="12"
                                            ToolTip="Sum of all items in the Collaboration tab (meetings, reviews, documentation, etc.)" />
-                                <TextBlock Grid.Column="1" Text="{Binding TotalCollaborationHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#F59E0B" />
+                                <TextBlock Grid.Column="1" Text="{Binding CollaborationTotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#F59E0B" />
                             </Grid>
 
                             <Separator Margin="0,8" />

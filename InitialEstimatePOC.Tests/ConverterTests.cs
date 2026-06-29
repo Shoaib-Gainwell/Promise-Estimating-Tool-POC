@@ -24,7 +24,7 @@ public class ConverterTests
     {
         var converter = new ComponentTypeDisplayConverter();
         var result = converter.Convert(ComponentType.MISC, typeof(string), null!, CultureInfo.InvariantCulture);
-        Assert.Equal("MISC", result);
+        Assert.Equal("MISC (Server Setup, Webserver Setup, Software Installation, etc.)", result);
     }
 
     [Fact]

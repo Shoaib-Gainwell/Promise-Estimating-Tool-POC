@@ -423,7 +423,7 @@ public class NewFeaturesTests
         vm.TestCasesSimple = 10;
         vm.TestCasesMedium = 5;
         vm.TestCaseIterations = 2;
-        // System Testing = (10*0.5 + 5*1) * 2 = (5 + 5) * 2 = 20
+        // System Testing = ROUNDUP((10*2.1925 + 5*4.065 + (10*1.5675 + 5*3.44)*0.1) * 2, 2) = 91.08
 
         // Add actual hours and time for estimates
         vm.TotalActualHours = 15m;
@@ -433,7 +433,7 @@ public class NewFeaturesTests
         // Add comments
         vm.AdjustedHoursComments = "All combined test";
 
-        Assert.Equal(20m, vm.SystemTestingHours);
+        Assert.Equal(91.08m, vm.SystemTestingHours);
         Assert.True(vm.SubtotalHours > 0);
         Assert.True(vm.GrandTotalHours > 0);
         Assert.NotNull(vm.ActualHoursAsOfDate);

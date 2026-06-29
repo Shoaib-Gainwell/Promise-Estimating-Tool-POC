@@ -38,15 +38,15 @@ public class ConverterAdvancedTests
     [Theory]
     [InlineData(ComponentType.PowerBuilderWindows, "PowerBuilder Windows")]
     [InlineData(ComponentType.Reports, "Reports")]
-    [InlineData(ComponentType.ProgramsDBStoredProcs, "Programs/DB Stored Procs")]
-    [InlineData(ComponentType.SupportModules, "Support Modules")]
-    [InlineData(ComponentType.DBManipulation, "DB Manipulation")]
+    [InlineData(ComponentType.ProgramsDBStoredProcs, "Programs/DB Stored Procedures")]
+    [InlineData(ComponentType.SupportModules, "Support Modules/JOB/JIL")]
+    [InlineData(ComponentType.DBManipulation, "DB Manipulation (SQL, PL/SQL, etc.)")]
     [InlineData(ComponentType.DatabaseReview, "Database Review")]
-    [InlineData(ComponentType.Webpage, "Webpage")]
+    [InlineData(ComponentType.Webpage, "Webpage (Includes UI, Portal & Intranet)")]
     [InlineData(ComponentType.K2Workflow, "K2 Workflow")]
     [InlineData(ComponentType.K2SmartForm, "K2 Smart Form")]
-    [InlineData(ComponentType.TestAutomationUFT, "Test Automation (UFT)")]
-    [InlineData(ComponentType.MISC, "MISC")]
+    [InlineData(ComponentType.TestAutomationUFT, "Test Automation Suites (UFT)")]
+    [InlineData(ComponentType.MISC, "MISC (Server Setup, Webserver Setup, Software Installation, etc.)")]
     public void ComponentTypeConverter_AllTypes_DisplayCorrectly(ComponentType type, string expected)
     {
         var converter = new ComponentTypeDisplayConverter();

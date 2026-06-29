@@ -334,7 +334,8 @@ public class PersistenceRoundTripTests
         var vm = CreateVm();
         vm.AddCollaborationItemCommand.Execute(null);
         vm.AddCollaborationItemCommand.Execute(null);
-        Assert.Equal(2, vm.CollaborationItems.Count);
+        // 4 defaults + 2 added = 6
+        Assert.Equal(6, vm.CollaborationItems.Count);
 
         var entity = new ProjectEntity
         {
@@ -404,6 +405,15 @@ public class PersistenceRoundTripTests
     {
         var vm = CreateVm();
         vm.ProjectName = "Valid Project Name";
+        vm.ChangeOrderId = "CO-001";
+        vm.ProjectDescription = "Test";
+        vm.EstimatedBy = "Tester";
+        vm.ReviewedBy = "Reviewer";
+        vm.AddComponentCommand.Execute(null);
+        vm.Components[0].ComponentType = ComponentType.MISC;
+        vm.Components[0].Size = ComponentSize.Small;
+        vm.Components[0].ChangeType = ChangeType.New;
+        vm.Components[0].Count = 1;
         Assert.Null(vm.SaveProject());
     }
 

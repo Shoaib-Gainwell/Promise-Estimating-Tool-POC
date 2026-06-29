@@ -230,7 +230,7 @@ public partial class MainViewModel : ObservableObject
     private int _testCasesVeryComplex;
 
     [ObservableProperty]
-    private int _testCaseIterations = 1;
+    private decimal _testCaseIterations = 1m;
 
     // === Role Breakout ===
     [ObservableProperty]
@@ -273,6 +273,12 @@ public partial class MainViewModel : ObservableObject
     public int[] PrepTimeOptions => Enumerable.Range(0, 13).Select(i => i * 15).ToArray();
 
     /// <summary>
+    /// True when at least one component row exists in the grid.
+    /// Used to enable/disable Collaboration and Adjustments tabs.
+    /// </summary>
+    public bool HasComponents => Components.Count > 0;
+
+    /// <summary>
     /// True when at least one component row has all required columns filled:
     /// Req#, Component Type, New/Change, Size, and Count > 0.
     /// Used to enable the Collaboration tab.
@@ -295,6 +301,7 @@ public partial class MainViewModel : ObservableObject
                 foreach (ComponentRowViewModel row in e.OldItems)
                     row.PropertyChanged -= OnComponentRowPropertyChanged;
             Recalculate();
+            OnPropertyChanged(nameof(HasComponents));
             OnPropertyChanged(nameof(HasValidComponents));
         };
         CollaborationItems.CollectionChanged += (_, _) => Recalculate();
@@ -421,7 +428,7 @@ public partial class MainViewModel : ObservableObject
         TestCasesMedium = 0;
         TestCasesComplex = 0;
         TestCasesVeryComplex = 0;
-        TestCaseIterations = 0;
+        TestCaseIterations = 0m;
 
         // Reset actual hours
         TotalActualHours = 0m;
@@ -504,7 +511,7 @@ public partial class MainViewModel : ObservableObject
     partial void OnTestCasesMediumChanged(int value) => Recalculate();
     partial void OnTestCasesComplexChanged(int value) => Recalculate();
     partial void OnTestCasesVeryComplexChanged(int value) => Recalculate();
-    partial void OnTestCaseIterationsChanged(int value) => Recalculate();
+    partial void OnTestCaseIterationsChanged(decimal value) => Recalculate();
     partial void OnTotalActualHoursChanged(decimal value) => Recalculate();
     partial void OnTimeForEstimatesChanged(decimal value) => Recalculate();
 
@@ -526,7 +533,6 @@ public partial class MainViewModel : ObservableObject
 
         // Effective Development = component hours + adjustment
         decimal effectiveDev = dev + DevelopmentAdjustedHours;
-        TotalDevelopmentHours = effectiveDev;
 
         // Step 2: System Testing (depends on effectiveDev)
         if (UseTestCasesForEstimate)
@@ -540,7 +546,7 @@ public partial class MainViewModel : ObservableObject
                                 + TestCasesComplex * r31Complex + TestCasesVeryComplex * r31VeryComplex;
             decimal defectHours = (TestCasesSimple * r32Simple + TestCasesMedium * r32Medium
                                 + TestCasesComplex * r32Complex + TestCasesVeryComplex * r32VeryComplex) * 0.1m;
-            SystemTestingHours = RoundUp((mainHours + defectHours) * Math.Max(1, TestCaseIterations));
+            SystemTestingHours = RoundUp((mainHours + defectHours) * Math.Max(1m, TestCaseIterations));
         }
         else
         {
@@ -994,7 +1000,7 @@ public partial class ComponentRowViewModel : ObservableObject
 
     public void UpdateBaseHours()
     {
-        if (ComponentType == ComponentType.None || Size == ComponentSize.None || ChangeType == ChangeType.None)
+        if (ComponentType == ComponentType.None || Size == ComponentSize.None || ChangeType == ChangeType.None || Count <= 0)
         {
             BaseHoursPerUnit = 0m;
             OnPropertyChanged(nameof(TotalHours));
@@ -1007,7 +1013,7 @@ public partial class ComponentRowViewModel : ObservableObject
     partial void OnComponentTypeChanged(ComponentType value) => UpdateBaseHours();
     partial void OnSizeChanged(ComponentSize value) => UpdateBaseHours();
     partial void OnChangeTypeChanged(ChangeType value) => UpdateBaseHours();
-    partial void OnCountChanged(int value) => OnPropertyChanged(nameof(TotalHours));
+    partial void OnCountChanged(int value) => UpdateBaseHours();
 }
 
 // === Collaboration Row ViewModel ===

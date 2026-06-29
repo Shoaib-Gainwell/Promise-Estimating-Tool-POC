@@ -149,9 +149,9 @@ public class WeightedValuesAdvancedTests : IDisposable
     [Fact]
     public void GetBaseHours_AllCombinationsReturnPositive()
     {
-        foreach (var type in Enum.GetValues<ComponentType>())
-        foreach (var size in Enum.GetValues<ComponentSize>())
-        foreach (var change in Enum.GetValues<ChangeType>())
+        foreach (var type in Enum.GetValues<ComponentType>().Where(v => v != ComponentType.None))
+        foreach (var size in Enum.GetValues<ComponentSize>().Where(v => v != ComponentSize.None))
+        foreach (var change in Enum.GetValues<ChangeType>().Where(v => v != ChangeType.None))
         {
             var hours = WeightedValues.GetBaseHours(type, size, change);
             Assert.True(hours > 0, $"Expected positive hours for {type}/{size}/{change} but got {hours}");

@@ -58,6 +58,15 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Test Project";
+        vm.ChangeOrderId = "CO-001";
+        vm.ProjectDescription = "Test description";
+        vm.EstimatedBy = "Tester";
+        vm.ReviewedBy = "Reviewer";
+        vm.AddComponentCommand.Execute(null);
+        vm.Components[0].ComponentType = ComponentType.MISC;
+        vm.Components[0].Size = ComponentSize.Small;
+        vm.Components[0].ChangeType = ChangeType.New;
+        vm.Components[0].Count = 1;
 
         var result = vm.SaveProject();
 
@@ -144,6 +153,15 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = $"Date Test {Guid.NewGuid():N}";
+        vm.ChangeOrderId = "CO-001";
+        vm.ProjectDescription = "Test";
+        vm.EstimatedBy = "Tester";
+        vm.ReviewedBy = "Reviewer";
+        vm.AddComponentCommand.Execute(null);
+        vm.Components[0].ComponentType = ComponentType.MISC;
+        vm.Components[0].Size = ComponentSize.Small;
+        vm.Components[0].ChangeType = ChangeType.New;
+        vm.Components[0].Count = 1;
         vm.SaveProject();
 
         var projects = MainViewModel.GetAllProjects();
@@ -515,7 +533,15 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Delete Test";
+        vm.ChangeOrderId = "CO-001";
+        vm.ProjectDescription = "Test";
+        vm.EstimatedBy = "Tester";
+        vm.ReviewedBy = "Reviewer";
         vm.AddComponentCommand.Execute(null);
+        vm.Components[0].ComponentType = ComponentType.MISC;
+        vm.Components[0].Size = ComponentSize.Small;
+        vm.Components[0].ChangeType = ChangeType.New;
+        vm.Components[0].Count = 1;
         vm.SaveProject();
 
         var projects = MainViewModel.GetAllProjects();
@@ -535,8 +561,20 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Cascade Test";
+        vm.ChangeOrderId = "CO-001";
+        vm.ProjectDescription = "Test";
+        vm.EstimatedBy = "Tester";
+        vm.ReviewedBy = "Reviewer";
         vm.AddComponentCommand.Execute(null);
+        vm.Components[0].ComponentType = ComponentType.MISC;
+        vm.Components[0].Size = ComponentSize.Small;
+        vm.Components[0].ChangeType = ChangeType.New;
+        vm.Components[0].Count = 1;
         vm.AddComponentCommand.Execute(null);
+        vm.Components[1].ComponentType = ComponentType.Reports;
+        vm.Components[1].Size = ComponentSize.Medium;
+        vm.Components[1].ChangeType = ChangeType.New;
+        vm.Components[1].Count = 1;
         vm.SaveProject();
 
         var projects = MainViewModel.GetAllProjects();
