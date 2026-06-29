@@ -11,7 +11,7 @@ public class EstimateDbContext : DbContext
     public DbSet<ComponentEntryEntity> ComponentEntries { get; set; } = null!;
     public DbSet<CollaborationItemEntity> CollaborationItems { get; set; } = null!;
 
-    private readonly string _dbPath;
+    private readonly string _dbPath = string.Empty;
 
     public EstimateDbContext()
     {

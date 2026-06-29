@@ -99,12 +99,22 @@ public static class WeightedValues
         { (ComponentType.MISC, ComponentSize.Large, ChangeType.Change), 50.00m },
     };
 
+    private static readonly Dictionary<(ComponentType, ComponentSize, ChangeType), decimal> _defaults = new(_matrix);
+
     /// <summary>
     /// Get the base hours per unit for a given component type, size, and change type.
     /// </summary>
     public static decimal GetBaseHours(ComponentType componentType, ComponentSize size, ChangeType changeType)
     {
         return _matrix.TryGetValue((componentType, size, changeType), out var value) ? value : 0m;
+    }
+
+    /// <summary>
+    /// Reset the in-memory matrix back to compiled defaults. Used by tests.
+    /// </summary>
+    public static void ResetToDefaults()
+    {
+        _matrix = new Dictionary<(ComponentType, ComponentSize, ChangeType), decimal>(_defaults);
     }
 
     /// <summary>

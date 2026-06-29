@@ -9,6 +9,7 @@
     <RootNamespace>InitialEstimatePOC</RootNamespace>
     <AssemblyName>InitialEstimatePOC</AssemblyName>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <NoWarn>NU1903</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

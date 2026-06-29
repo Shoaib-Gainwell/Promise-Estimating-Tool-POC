@@ -71,9 +71,13 @@ public class DatabaseSeederTests : IDisposable
         DatabaseSeeder.Initialize(_db);
 
         var types = _db.WeightedValues.Select(v => v.ComponentType).Distinct().ToList();
+        // 11 real component types (excludes None placeholder)
         Assert.Equal(11, types.Count);
         foreach (var enumVal in Enum.GetValues<ComponentType>())
+        {
+            if (enumVal == ComponentType.None) continue;
             Assert.Contains(enumVal, types);
+        }
     }
 
     [Fact]

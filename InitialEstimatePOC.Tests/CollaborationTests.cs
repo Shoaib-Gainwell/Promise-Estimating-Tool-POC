@@ -153,10 +153,10 @@ public class CollaborationTests
     #region Default Collaboration Items
 
     [Fact]
-    public void DefaultCollaboration_StartsEmpty()
+    public void DefaultCollaboration_Has4DefaultItems()
     {
         var vm = CreateVm();
-        Assert.Empty(vm.CollaborationItems);
+        Assert.Equal(4, vm.CollaborationItems.Count);
         Assert.Equal(0m, vm.TotalCollaborationHours);
     }
 
@@ -179,10 +179,10 @@ public class CollaborationTests
         var vm = CreateVm();
         vm.AddCollaborationItemCommand.Execute(null);
         var added = vm.CollaborationItems[^1];
-        Assert.Equal(5, added.NumberOfMeetings);
-        Assert.Equal(60, added.MeetingDurationMinutes);
-        Assert.Equal(3, added.NumberOfParticipants);
-        Assert.Equal(15, added.ParticipantPrepTimeMinutes);
+        Assert.Equal(0, added.NumberOfMeetings);
+        Assert.Equal(0, added.MeetingDurationMinutes);
+        Assert.Equal(0, added.NumberOfParticipants);
+        Assert.Equal(0, added.ParticipantPrepTimeMinutes);
     }
 
     [Fact]
@@ -191,8 +191,8 @@ public class CollaborationTests
         var vm = CreateVm();
         decimal before = vm.TotalCollaborationHours;
         vm.AddCollaborationItemCommand.Execute(null);
-        // New item: 5 × (60/60 + 15/60) × 3 = 18.75
-        Assert.Equal(before + 18.75m, vm.TotalCollaborationHours);
+        // New item: all zeros, so 0 hours added
+        Assert.Equal(before, vm.TotalCollaborationHours);
     }
 
     [Fact]
@@ -243,7 +243,11 @@ public class CollaborationTests
     public void ChangeNumberOfMeetings_UpdatesTotal()
     {
         var vm = CreateVm();
-        vm.AddCollaborationItemCommand.Execute(null);
+        // Set up the first default item with values
+        vm.CollaborationItems[0].NumberOfMeetings = 5;
+        vm.CollaborationItems[0].MeetingDurationMinutes = 60;
+        vm.CollaborationItems[0].NumberOfParticipants = 3;
+        vm.CollaborationItems[0].ParticipantPrepTimeMinutes = 15;
         decimal before = vm.TotalCollaborationHours;
         vm.CollaborationItems[0].NumberOfMeetings = 20; // was 5
         // Diff: 15 extra meetings × (60/60 + 15/60) × 3 = 15 × 1.25 × 3 = 56.25
@@ -254,9 +258,11 @@ public class CollaborationTests
     public void ChangeMeetingDuration_UpdatesTotal()
     {
         var vm = CreateVm();
-        vm.AddCollaborationItemCommand.Execute(null);
         var item = vm.CollaborationItems[0];
-        item.MeetingDurationMinutes = 120; // was 60
+        item.NumberOfMeetings = 5;
+        item.NumberOfParticipants = 3;
+        item.ParticipantPrepTimeMinutes = 15;
+        item.MeetingDurationMinutes = 120;
         // 5 × (120/60 + 15/60) × 3 = 5 × 2.25 × 3 = 33.75
         Assert.Equal(33.75m, item.TotalHours);
     }
@@ -265,9 +271,11 @@ public class CollaborationTests
     public void ChangeNumberOfParticipants_UpdatesTotal()
     {
         var vm = CreateVm();
-        vm.AddCollaborationItemCommand.Execute(null);
         var item = vm.CollaborationItems[0];
-        item.NumberOfParticipants = 5; // was 3
+        item.NumberOfMeetings = 5;
+        item.MeetingDurationMinutes = 60;
+        item.ParticipantPrepTimeMinutes = 15;
+        item.NumberOfParticipants = 5;
         // 5 × (60/60 + 15/60) × 5 = 5 × 1.25 × 5 = 31.25
         Assert.Equal(31.25m, item.TotalHours);
     }
@@ -290,7 +298,6 @@ public class CollaborationTests
     public void CollaborationChange_AffectsGrandTotal()
     {
         var vm = CreateVm();
-        vm.AddCollaborationItemCommand.Execute(null);
         vm.AddComponentCommand.Execute(null);
         vm.Components[0].ComponentType = ComponentType.MISC;
         vm.Components[0].Size = ComponentSize.Large;
@@ -298,6 +305,9 @@ public class CollaborationTests
         vm.Components[0].Count = 1;
         decimal before = vm.GrandTotalHours;
         vm.CollaborationItems[0].NumberOfMeetings = 20;
+        vm.CollaborationItems[0].MeetingDurationMinutes = 60;
+        vm.CollaborationItems[0].NumberOfParticipants = 3;
+        vm.CollaborationItems[0].ParticipantPrepTimeMinutes = 15;
         Assert.True(vm.GrandTotalHours > before);
     }
 

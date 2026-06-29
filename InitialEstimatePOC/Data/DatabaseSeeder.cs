@@ -10,17 +10,17 @@ public static class DatabaseSeeder
         db.Database.EnsureCreated();
 
         // Add new columns to existing databases if not present (each independently so a pre-existing column doesn't abort the rest)
-        var newCols = new[]
+        var alterStatements = new[]
         {
-            ("WPRS_ADJUSTED_HOURS", "REAL DEFAULT 0"),
-            ("CLIENT_MTG_ADJUSTED_HOURS", "REAL DEFAULT 0"),
-            ("INTERNAL_MTG_ADJUSTED_HOURS", "REAL DEFAULT 0"),
-            ("AUTO_TEST_ADJUSTED_HOURS", "REAL DEFAULT 0"),
-            ("CONSULTANT_ADJUSTED_HOURS", "REAL DEFAULT 0"),
+            "ALTER TABLE PROJECT_ESTIMATES ADD COLUMN WPRS_ADJUSTED_HOURS REAL DEFAULT 0",
+            "ALTER TABLE PROJECT_ESTIMATES ADD COLUMN CLIENT_MTG_ADJUSTED_HOURS REAL DEFAULT 0",
+            "ALTER TABLE PROJECT_ESTIMATES ADD COLUMN INTERNAL_MTG_ADJUSTED_HOURS REAL DEFAULT 0",
+            "ALTER TABLE PROJECT_ESTIMATES ADD COLUMN AUTO_TEST_ADJUSTED_HOURS REAL DEFAULT 0",
+            "ALTER TABLE PROJECT_ESTIMATES ADD COLUMN CONSULTANT_ADJUSTED_HOURS REAL DEFAULT 0",
         };
-        foreach (var (col, def) in newCols)
+        foreach (var sql in alterStatements)
         {
-            try { db.Database.ExecuteSqlRaw($"ALTER TABLE PROJECT_ESTIMATES ADD COLUMN {col} {def}"); }
+            try { db.Database.ExecuteSqlRaw(sql); }
             catch { /* column already exists — ignore */ }
         }
 

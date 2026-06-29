@@ -40,6 +40,33 @@ public class DecimalFormatConverter : IValueConverter
 }
 
 /// <summary>
+/// Two-way converter for adjusted hours fields that allows empty/intermediate input.
+/// Empty or whitespace → 0m. Displays non-zero values without trailing zeros.
+/// </summary>
+public class AdjustedHoursConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is decimal d && d != 0m)
+            return d.ToString("0.##");
+        return string.Empty;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is string s)
+        {
+            var trimmed = s.Trim();
+            if (string.IsNullOrEmpty(trimmed) || trimmed == "-" || trimmed == ".")
+                return 0m;
+            if (decimal.TryParse(trimmed, NumberStyles.Number, culture, out var result))
+                return result;
+        }
+        return 0m;
+    }
+}
+
+/// <summary>
 /// Returns Visible when value is 0 (for empty state), Collapsed otherwise.
 /// </summary>
 public class ZeroToVisibilityConverter : IValueConverter

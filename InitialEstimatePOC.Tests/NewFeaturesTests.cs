@@ -185,7 +185,7 @@ public class NewFeaturesTests
     public void UseTestCases_DefaultIterationsIsOne()
     {
         var vm = CreateVm();
-        Assert.Equal(1, vm.TestCaseIterations);
+        Assert.Equal(1m, vm.TestCaseIterations);
     }
 
     #endregion
@@ -418,12 +418,14 @@ public class NewFeaturesTests
         var vm = CreateVm();
         AddComponent(vm, ComponentType.PowerBuilderWindows, ComponentSize.Medium, ChangeType.New, 2);
 
-        // Enable test cases
+        // Enable test cases (using new row31/row32 formula)
         vm.UseTestCasesForEstimate = true;
         vm.TestCasesSimple = 10;
         vm.TestCasesMedium = 5;
         vm.TestCaseIterations = 2;
-        // System Testing = (10*0.5 + 5*1) * 2 = (5 + 5) * 2 = 20
+        // row31: 10*2.1925+5*4.065=42.25  row32defect: (10*1.5675+5*3.44)*0.1=3.2875 → ROUNDUP((42.25+3.2875)*2,2)=91.08
+        decimal expectedSysTest = MainViewModel.RoundUp(
+            (10m * 2.1925m + 5m * 4.065m + (10m * 1.5675m + 5m * 3.44m) * 0.1m) * 2m);
 
         // Add actual hours and time for estimates
         vm.TotalActualHours = 15m;
@@ -433,7 +435,7 @@ public class NewFeaturesTests
         // Add comments
         vm.AdjustedHoursComments = "All combined test";
 
-        Assert.Equal(20m, vm.SystemTestingHours);
+        Assert.Equal(expectedSysTest, vm.SystemTestingHours);
         Assert.True(vm.SubtotalHours > 0);
         Assert.True(vm.GrandTotalHours > 0);
         Assert.NotNull(vm.ActualHoursAsOfDate);
@@ -483,7 +485,7 @@ public class NewFeaturesTests
         Assert.Equal(5, vm.TestCasesMedium);
         Assert.Equal(3, vm.TestCasesComplex);
         Assert.Equal(1, vm.TestCasesVeryComplex);
-        Assert.Equal(2, vm.TestCaseIterations);
+        Assert.Equal(2m, vm.TestCaseIterations);
         // Verify calculation: row31: 10*2.1925+5*4.065+3*8.76+1*14.38=82.91  defect*0.1=6.8535  → ROUNDUP(89.7635*2,2)=179.53
         Assert.Equal(179.53m, vm.SystemTestingHours);
     }

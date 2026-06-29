@@ -201,15 +201,15 @@ public class WeightedValuesTests
     [Theory]
     [InlineData(ComponentType.PowerBuilderWindows, "PowerBuilder Windows")]
     [InlineData(ComponentType.Reports, "Reports")]
-    [InlineData(ComponentType.ProgramsDBStoredProcs, "Programs/DB Stored Procs")]
-    [InlineData(ComponentType.SupportModules, "Support Modules")]
-    [InlineData(ComponentType.DBManipulation, "DB Manipulation")]
+    [InlineData(ComponentType.ProgramsDBStoredProcs, "Programs/DB Stored Procedures")]
+    [InlineData(ComponentType.SupportModules, "Support Modules/JOB/JIL")]
+    [InlineData(ComponentType.DBManipulation, "DB Manipulation (SQL, PL/SQL, etc.)")]
     [InlineData(ComponentType.DatabaseReview, "Database Review")]
-    [InlineData(ComponentType.Webpage, "Webpage")]
+    [InlineData(ComponentType.Webpage, "Webpage (Includes UI, Portal & Intranet)")]
     [InlineData(ComponentType.K2Workflow, "K2 Workflow")]
     [InlineData(ComponentType.K2SmartForm, "K2 Smart Form")]
-    [InlineData(ComponentType.TestAutomationUFT, "Test Automation (UFT)")]
-    [InlineData(ComponentType.MISC, "MISC")]
+    [InlineData(ComponentType.TestAutomationUFT, "Test Automation Suites (UFT)")]
+    [InlineData(ComponentType.MISC, "MISC (Server Setup, Webserver Setup, Software Installation, etc.)")]
     public void GetDisplayName_ReturnsCorrectName(ComponentType type, string expected)
     {
         Assert.Equal(expected, WeightedValues.GetDisplayName(type));
@@ -266,14 +266,22 @@ public class WeightedValuesTests
     public void TotalWeightedValues_Count_Is66()
     {
         // Verify we have all 66 combinations (11 types × 3 sizes × 2 change types)
+        // Skip None enum values which are placeholder selections
         int count = 0;
         foreach (ComponentType ct in Enum.GetValues<ComponentType>())
-        foreach (ComponentSize sz in Enum.GetValues<ComponentSize>())
-        foreach (ChangeType ch in Enum.GetValues<ChangeType>())
         {
-            if (WeightedValues.GetBaseHours(ct, sz, ch) > 0 || 
-                (ct == ComponentType.TestAutomationUFT)) // UFT has valid values
-                count++;
+            if (ct == ComponentType.None) continue;
+            foreach (ComponentSize sz in Enum.GetValues<ComponentSize>())
+            {
+                if (sz == ComponentSize.None) continue;
+                foreach (ChangeType ch in Enum.GetValues<ChangeType>())
+                {
+                    if (ch == ChangeType.None) continue;
+                    if (WeightedValues.GetBaseHours(ct, sz, ch) > 0 || 
+                        (ct == ComponentType.TestAutomationUFT)) // UFT has valid values
+                        count++;
+                }
+            }
         }
         Assert.Equal(66, count);
     }

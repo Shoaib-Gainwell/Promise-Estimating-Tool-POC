@@ -10,7 +10,7 @@ namespace InitialEstimatePOC.Tests;
 /// change tracking, and status messages.
 /// Uses the real app DB (seeded on app startup).
 /// </summary>
-public class SettingsViewModelTests
+public class SettingsViewModelTests : IDisposable
 {
     private SettingsViewModel CreateVm()
     {
@@ -231,5 +231,10 @@ public class SettingsViewModelTests
 
         // Restore
         vm.ResetToDefaultsCommand.Execute(null);
+    }
+
+    public void Dispose()
+    {
+        WeightedValues.ResetToDefaults();
     }
 }

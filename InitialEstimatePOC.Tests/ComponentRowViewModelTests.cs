@@ -16,7 +16,9 @@ public class ComponentRowViewModelTests
     public void SetComponentType_UpdatesBaseHours()
     {
         var row = new ComponentRowViewModel();
-        // Default is PowerBuilderWindows, change to Reports to trigger update
+        // Defaults are None — set Size and ChangeType first, then ComponentType
+        row.Size = ComponentSize.Small;
+        row.ChangeType = ChangeType.New;
         row.ComponentType = ComponentType.Reports;
         // Reports Small New = 17.00
         Assert.Equal(17.00m, row.BaseHoursPerUnit);
@@ -27,6 +29,7 @@ public class ComponentRowViewModelTests
     {
         var row = new ComponentRowViewModel();
         row.ComponentType = ComponentType.Reports;
+        row.ChangeType = ChangeType.New;
         row.Size = ComponentSize.Medium;
         // Reports Medium New = 51.00
         Assert.Equal(51.00m, row.BaseHoursPerUnit);
@@ -91,11 +94,11 @@ public class ComponentRowViewModelTests
         var row = new ComponentRowViewModel();
         Assert.Equal(0, row.LineNumber);
         Assert.Equal(string.Empty, row.RequirementId);
-        Assert.Equal(ComponentType.PowerBuilderWindows, row.ComponentType); // First enum value
+        Assert.Equal(ComponentType.None, row.ComponentType);
         Assert.Equal(string.Empty, row.Description);
-        Assert.Equal(ChangeType.New, row.ChangeType); // First enum value
-        Assert.Equal(ComponentSize.Small, row.Size); // First enum value
-        Assert.Equal(1, row.Count);
+        Assert.Equal(ChangeType.None, row.ChangeType);
+        Assert.Equal(ComponentSize.None, row.Size);
+        Assert.Equal(0, row.Count);
     }
 
     [Fact]
@@ -122,10 +125,14 @@ public class ComponentRowViewModelTests
     public void ChangeComponentType_RaisesPropertyChanged()
     {
         var row = new ComponentRowViewModel();
+        // Set to valid values first so the change from Reports to MISC triggers events
+        row.Size = ComponentSize.Small;
+        row.ChangeType = ChangeType.New;
+        row.ComponentType = ComponentType.Reports;
         var raised = new List<string>();
         row.PropertyChanged += (_, e) => raised.Add(e.PropertyName!);
 
-        row.ComponentType = ComponentType.Reports;
+        row.ComponentType = ComponentType.MISC;
 
         Assert.Contains(nameof(ComponentRowViewModel.ComponentType), raised);
         Assert.Contains(nameof(ComponentRowViewModel.BaseHoursPerUnit), raised);
@@ -136,6 +143,9 @@ public class ComponentRowViewModelTests
     public void ChangeSize_RaisesPropertyChanged()
     {
         var row = new ComponentRowViewModel();
+        row.ComponentType = ComponentType.Reports;
+        row.ChangeType = ChangeType.New;
+        row.Size = ComponentSize.Small;
         var raised = new List<string>();
         row.PropertyChanged += (_, e) => raised.Add(e.PropertyName!);
 

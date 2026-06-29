@@ -28,6 +28,7 @@ public class WeightedValuesAdvancedTests : IDisposable
     {
         _db.Database.CloseConnection();
         _db.Dispose();
+        WeightedValues.ResetToDefaults();
     }
 
     #region LoadFromDatabase Tests
@@ -150,11 +151,18 @@ public class WeightedValuesAdvancedTests : IDisposable
     public void GetBaseHours_AllCombinationsReturnPositive()
     {
         foreach (var type in Enum.GetValues<ComponentType>())
-        foreach (var size in Enum.GetValues<ComponentSize>())
-        foreach (var change in Enum.GetValues<ChangeType>())
         {
-            var hours = WeightedValues.GetBaseHours(type, size, change);
-            Assert.True(hours > 0, $"Expected positive hours for {type}/{size}/{change} but got {hours}");
+            if (type == ComponentType.None) continue;
+            foreach (var size in Enum.GetValues<ComponentSize>())
+            {
+                if (size == ComponentSize.None) continue;
+                foreach (var change in Enum.GetValues<ChangeType>())
+                {
+                    if (change == ChangeType.None) continue;
+                    var hours = WeightedValues.GetBaseHours(type, size, change);
+                    Assert.True(hours > 0, $"Expected positive hours for {type}/{size}/{change} but got {hours}");
+                }
+            }
         }
     }
 
@@ -162,14 +170,18 @@ public class WeightedValuesAdvancedTests : IDisposable
     public void GetBaseHours_ChangeType_AlwaysLessOrEqualNew()
     {
         foreach (var type in Enum.GetValues<ComponentType>())
-        foreach (var size in Enum.GetValues<ComponentSize>())
         {
-            var newHours = WeightedValues.GetBaseHours(type, size, ChangeType.New);
-            var changeHours = WeightedValues.GetBaseHours(type, size, ChangeType.Change);
-            // UFT has inverted values by design, skip those
-            if (type != ComponentType.TestAutomationUFT)
-                Assert.True(changeHours <= newHours,
-                    $"{type}/{size}: Change ({changeHours}) should be <= New ({newHours})");
+            if (type == ComponentType.None) continue;
+            foreach (var size in Enum.GetValues<ComponentSize>())
+            {
+                if (size == ComponentSize.None) continue;
+                var newHours = WeightedValues.GetBaseHours(type, size, ChangeType.New);
+                var changeHours = WeightedValues.GetBaseHours(type, size, ChangeType.Change);
+                // UFT has inverted values by design, skip those
+                if (type != ComponentType.TestAutomationUFT)
+                    Assert.True(changeHours <= newHours,
+                        $"{type}/{size}: Change ({changeHours}) should be <= New ({newHours})");
+            }
         }
     }
 

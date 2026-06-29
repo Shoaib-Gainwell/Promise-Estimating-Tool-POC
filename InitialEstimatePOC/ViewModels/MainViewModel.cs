@@ -230,7 +230,7 @@ public partial class MainViewModel : ObservableObject
     private int _testCasesVeryComplex;
 
     [ObservableProperty]
-    private int _testCaseIterations = 1;
+    private decimal _testCaseIterations = 1m;
 
     // === Role Breakout ===
     [ObservableProperty]
@@ -504,7 +504,7 @@ public partial class MainViewModel : ObservableObject
     partial void OnTestCasesMediumChanged(int value) => Recalculate();
     partial void OnTestCasesComplexChanged(int value) => Recalculate();
     partial void OnTestCasesVeryComplexChanged(int value) => Recalculate();
-    partial void OnTestCaseIterationsChanged(int value) => Recalculate();
+    partial void OnTestCaseIterationsChanged(decimal value) => Recalculate();
     partial void OnTotalActualHoursChanged(decimal value) => Recalculate();
     partial void OnTimeForEstimatesChanged(decimal value) => Recalculate();
 
@@ -540,7 +540,7 @@ public partial class MainViewModel : ObservableObject
                                 + TestCasesComplex * r31Complex + TestCasesVeryComplex * r31VeryComplex;
             decimal defectHours = (TestCasesSimple * r32Simple + TestCasesMedium * r32Medium
                                 + TestCasesComplex * r32Complex + TestCasesVeryComplex * r32VeryComplex) * 0.1m;
-            SystemTestingHours = RoundUp((mainHours + defectHours) * Math.Max(1, TestCaseIterations));
+            SystemTestingHours = RoundUp((mainHours + defectHours) * Math.Max(1m, TestCaseIterations));
         }
         else
         {

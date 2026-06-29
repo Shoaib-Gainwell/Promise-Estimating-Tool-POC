@@ -332,9 +332,10 @@ public class PersistenceRoundTripTests
     public void LoadProject_ClearsPreviousCollaboration()
     {
         var vm = CreateVm();
+        // Default VM has 4 collaboration items; add extras
         vm.AddCollaborationItemCommand.Execute(null);
         vm.AddCollaborationItemCommand.Execute(null);
-        Assert.Equal(2, vm.CollaborationItems.Count);
+        Assert.Equal(6, vm.CollaborationItems.Count);
 
         var entity = new ProjectEntity
         {
@@ -404,6 +405,11 @@ public class PersistenceRoundTripTests
     {
         var vm = CreateVm();
         vm.ProjectName = "Valid Project Name";
+        vm.ChangeOrderId = "CO-001";
+        vm.ProjectDescription = "Test desc";
+        vm.EstimatedBy = "Tester";
+        vm.ReviewedBy = "Reviewer";
+        AddComponent(vm, ComponentType.MISC, ComponentSize.Small, ChangeType.New, 1);
         Assert.Null(vm.SaveProject());
     }
 
@@ -417,10 +423,20 @@ public class PersistenceRoundTripTests
         // Save two projects
         var vm1 = CreateVm();
         vm1.ProjectName = $"Project A {Guid.NewGuid():N}";
+        vm1.ChangeOrderId = "CO-A";
+        vm1.ProjectDescription = "Desc A";
+        vm1.EstimatedBy = "Tester";
+        vm1.ReviewedBy = "Reviewer";
+        AddComponent(vm1, ComponentType.MISC, ComponentSize.Small, ChangeType.New, 1);
         vm1.SaveProject();
 
         var vm2 = CreateVm();
         vm2.ProjectName = $"Project B {Guid.NewGuid():N}";
+        vm2.ChangeOrderId = "CO-B";
+        vm2.ProjectDescription = "Desc B";
+        vm2.EstimatedBy = "Tester";
+        vm2.ReviewedBy = "Reviewer";
+        AddComponent(vm2, ComponentType.MISC, ComponentSize.Small, ChangeType.New, 1);
         vm2.SaveProject();
 
         var all = MainViewModel.GetAllProjects();

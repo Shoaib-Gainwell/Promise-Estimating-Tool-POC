@@ -97,7 +97,7 @@ public class ProjectEntity
     public int TestCasesMedium { get; set; }
     public int TestCasesComplex { get; set; }
     public int TestCasesVeryComplex { get; set; }
-    public int TestCaseIterations { get; set; } = 1;
+    public decimal TestCaseIterations { get; set; } = 1m;
 
     /// <summary>Oracle: CREATED_DATE DATE</summary>
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;

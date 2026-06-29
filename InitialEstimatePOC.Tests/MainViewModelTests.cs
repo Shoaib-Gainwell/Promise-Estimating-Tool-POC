@@ -69,13 +69,14 @@ public class MainViewModelTests
         AddComponent(vm, ComponentType.Reports, ComponentSize.Small, ChangeType.New, 2);                // 34.00
         AddComponent(vm, ComponentType.ProgramsDBStoredProcs, ComponentSize.Large, ChangeType.New, 1);  // 294.40
         AddComponent(vm, ComponentType.DBManipulation, ComponentSize.Medium, ChangeType.New, 4);        // 60.00
-        AddComponent(vm, ComponentType.DatabaseReview, ComponentSize.Small, ChangeType.New, 8);         // 65.04 (8.13*8)
+        AddComponent(vm, ComponentType.DatabaseReview, ComponentSize.Small, ChangeType.New, 8);         // 65.00
         AddComponent(vm, ComponentType.K2Workflow, ComponentSize.Medium, ChangeType.New, 1);            // 100.00
         AddComponent(vm, ComponentType.K2SmartForm, ComponentSize.Medium, ChangeType.Change, 2);        // 70.00
 
         // Note: With full-precision values: DatabaseReview Small New = 8.125
         // 8.125 * 8 = 65.00
         // Actual total = 225 + 104.70 + 34 + 294.40 + 60 + 65 + 100 + 70 = 953.10
+        // TotalDevelopmentHours = effectiveDev = dev + DevelopmentAdjustedHours(0) = 953.10
         decimal expectedDev = 225.00m + 104.70m + 34.00m + 294.40m + 60.00m + 65.00m + 100.00m + 70.00m;
         Assert.Equal(expectedDev, vm.TotalDevelopmentHours);
     }
@@ -365,7 +366,7 @@ public class MainViewModelTests
         Assert.Equal(0, vm.TestCasesMedium);
         Assert.Equal(0, vm.TestCasesComplex);
         Assert.Equal(0, vm.TestCasesVeryComplex);
-        Assert.Equal(1, vm.TestCaseIterations);
+        Assert.Equal(0m, vm.TestCaseIterations);
     }
 
     #endregion

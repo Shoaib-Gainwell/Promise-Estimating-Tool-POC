@@ -31,6 +31,7 @@
     <Window.Resources>
         <conv:ComponentTypeDisplayConverter x:Key="ComponentTypeDisplay" />
         <conv:DecimalFormatConverter x:Key="DecimalFormat" />
+        <conv:AdjustedHoursConverter x:Key="AdjustedHours" />
         <conv:ZeroToVisibilityConverter x:Key="ZeroToVisibility" />
         <conv:EnumDisplayConverter x:Key="EnumDisplay" />
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
@@ -898,7 +899,7 @@
                                                            ToolTip="Sum of all component hours from the Components tab." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding TotalDevelopmentHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding DevelopmentAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" 
+                                            <TextBox Grid.Column="2" Text="{Binding DevelopmentAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding DevelopmentTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -919,7 +920,7 @@
                                                            ToolTip="Default: 5% of (Development + System Testing). Some analysis hours are included in Development." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding AnalysisHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding AnalysisAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" 
+                                            <TextBox Grid.Column="2" Text="{Binding AnalysisAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding AnalysisTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -940,7 +941,7 @@
                                                            ToolTip="Default: 15% of (Development + System Testing). Tech Design is covered under Development." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding BusinessDesignHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding BusinessDesignAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" 
+                                            <TextBox Grid.Column="2" Text="{Binding BusinessDesignAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding BusinessDesignTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -961,7 +962,7 @@
                                                            ToolTip="Default: 30% of Development. Test Automation effort should be selected under Development as 'Test Automation Suites (UFT)'." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding SystemTestingHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding SystemTestingAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" 
+                                            <TextBox Grid.Column="2" Text="{Binding SystemTestingAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding SystemTestingTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -982,7 +983,7 @@
                                                            ToolTip="Default: 5% of Development. Includes Dev, Model, E2E, UAT, Prod &amp; Training Environment promotion and System Documentation." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding PromotionHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding PromotionAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" 
+                                            <TextBox Grid.Column="2" Text="{Binding PromotionAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding PromotionTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1003,7 +1004,7 @@
                                                            ToolTip="Default: 5% of Development. BA System Documentation and Communication Plan." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding BaSystemDocHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding BaSystemDocAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" 
+                                            <TextBox Grid.Column="2" Text="{Binding BaSystemDocAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding BaSystemDocTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1024,7 +1025,7 @@
                                                            ToolTip="Default: 20% of System Testing. Includes time for documenting System Documentation." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding ProductionValidationHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding ProductionValidationAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" 
+                                            <TextBox Grid.Column="2" Text="{Binding ProductionValidationAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding ProductionValidationTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1045,7 +1046,7 @@
                                                            ToolTip="Default: PM% of overall effort (Development + all derived tasks). Change the percentage in Project Settings." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding ProjectManagementHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding ProjectManagementAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" 
+                                            <TextBox Grid.Column="2" Text="{Binding ProjectManagementAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding ProjectManagementTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1066,7 +1067,7 @@
                                                            ToolTip="10 WPRs — BRD (if applicable), Initial Estimate, BDD, Detailed Estimate, TDD, Code, Test Plan, Test Results, System Documentation and Production Validation.&#x0a;&#x0a;To make a Change → Select Number of WPRs, Meeting Duration, Number of Participants and Prep Time per Participant in the Collaboration tab." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding WprsHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding WprsAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}"
+                                            <TextBox Grid.Column="2" Text="{Binding WprsAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}"
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding WprsTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1087,7 +1088,7 @@
                                                            ToolTip="5 meetings with an average of 3 participants, with 15 mins of prep time for each participant yields 18.75 hours.&#x0a;&#x0a;To make a Change → Provide Number of meetings, Meeting Duration, Number of Participants and Prep Time per Participant in the Collaboration tab." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding ClientMeetingsHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding ClientMeetingsAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}"
+                                            <TextBox Grid.Column="2" Text="{Binding ClientMeetingsAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}"
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding ClientMeetingsTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1108,7 +1109,7 @@
                                                            ToolTip="5 meetings with an average of 3 participants, with 15 mins of prep time for each participant yields 18.75 hours.&#x0a;&#x0a;To make a Change → Provide Number of meetings, Meeting Duration, Number of Participants and Prep Time per Participant in the Collaboration tab." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding InternalMeetingsHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding InternalMeetingsAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}"
+                                            <TextBox Grid.Column="2" Text="{Binding InternalMeetingsAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}"
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding InternalMeetingsTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1129,7 +1130,7 @@
                                                            ToolTip="5 meetings with an average of 3 participants, with 15 mins of prep time for each participant yields 18.75 hours.&#x0a;&#x0a;To make a Change → Provide Number of meetings, Meeting Duration, Number of Participants and Prep Time per Participant in the Collaboration tab." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding AutomationTestCollabHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding AutomationTestCollabAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}"
+                                            <TextBox Grid.Column="2" Text="{Binding AutomationTestCollabAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}"
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding AutomationTestCollabTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1150,7 +1151,7 @@
                                                            ToolTip="Insert hours for Consultant and Mentors." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="0.00" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding ConsultantMentorAdjustedHours, StringFormat={}{0:0.##}, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}"
+                                            <TextBox Grid.Column="2" Text="{Binding ConsultantMentorAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}"
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding ConsultantMentorTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1324,7 +1325,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="System Testing (30%)" Foreground="#374151" FontSize="12" ToolTip="ROUNDUP(Development × 30%, 2) — Standard testing effort based on dev complexity" />
-                                <TextBlock Grid.Column="1" Text="{Binding SystemTestingHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
+                                <TextBlock Grid.Column="1" Text="{Binding SystemTestingTotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
                             </Grid>
 
                             <Grid Margin="0,4">
@@ -1333,7 +1334,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Analysis (5%)" Foreground="#374151" FontSize="12" ToolTip="ROUNDUP((Development + System Testing) × 5%, 2) — Requirements analysis effort" />
-                                <TextBlock Grid.Column="1" Text="{Binding AnalysisHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
+                                <TextBlock Grid.Column="1" Text="{Binding AnalysisTotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
                             </Grid>
 
                             <Grid Margin="0,4">
@@ -1342,7 +1343,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Business Design (15%)" Foreground="#374151" FontSize="12" ToolTip="ROUNDUP((Development + System Testing) × 15%, 2) — Business requirements and design documentation" />
-                                <TextBlock Grid.Column="1" Text="{Binding BusinessDesignHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
+                                <TextBlock Grid.Column="1" Text="{Binding BusinessDesignTotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
                             </Grid>
 
                             <Grid Margin="0,4">
@@ -1351,7 +1352,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Promotion (5%)" Foreground="#374151" FontSize="12" ToolTip="ROUNDUP(Development × 5%, 2) — Code promotion/deployment to environments" />
-                                <TextBlock Grid.Column="1" Text="{Binding PromotionHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
+                                <TextBlock Grid.Column="1" Text="{Binding PromotionTotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
                             </Grid>
 
                             <Grid Margin="0,4">
@@ -1360,7 +1361,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="BA System Documentation (5%)" Foreground="#374151" FontSize="12" ToolTip="ROUNDUP(Development × 5%, 2) — BA system documentation effort" />
-                                <TextBlock Grid.Column="1" Text="{Binding BaSystemDocHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
+                                <TextBlock Grid.Column="1" Text="{Binding BaSystemDocTotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
                             </Grid>
 
                             <Grid Margin="0,4">
@@ -1369,7 +1370,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Production Validation (20%)" Foreground="#374151" FontSize="12" ToolTip="ROUNDUP(System Testing × 20%, 2) — Production validation/verification after deployment" />
-                                <TextBlock Grid.Column="1" Text="{Binding ProductionValidationHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
+                                <TextBlock Grid.Column="1" Text="{Binding ProductionValidationTotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#059669" />
                             </Grid>
 
                             <Separator Margin="0,8" />
@@ -1390,7 +1391,7 @@
                                               ToolTip="Select Project Management Effort % (default 15%)" />
                                     <TextBlock Text="%" FontSize="11" Foreground="#6B7280" VerticalAlignment="Center" Margin="2,0,0,0" />
                                 </StackPanel>
-                                <TextBlock Grid.Column="2" Text="{Binding ProjectManagementHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#DC2626" />
+                                <TextBlock Grid.Column="2" Text="{Binding ProjectManagementTotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#DC2626" />
                             </Grid>
 
                             <!-- Collaboration Total -->
@@ -1400,8 +1401,8 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Collaboration" Foreground="#374151" FontSize="12"
-                                           ToolTip="Sum of all items in the Collaboration tab (meetings, reviews, documentation, etc.)" />
-                                <TextBlock Grid.Column="1" Text="{Binding TotalCollaborationHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#F59E0B" />
+                                           ToolTip="Sum of all collaboration types (calculated + adjusted hours)" />
+                                <TextBlock Grid.Column="1" Text="{Binding CollaborationTotalHours, StringFormat={}{0:N2} Hrs}" FontFamily="Cascadia Mono, Consolas" FontSize="13" Foreground="#F59E0B" />
                             </Grid>
 
                             <Separator Margin="0,8" />

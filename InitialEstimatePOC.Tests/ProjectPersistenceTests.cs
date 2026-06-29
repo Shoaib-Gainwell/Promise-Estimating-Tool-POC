@@ -31,6 +31,22 @@ public class ProjectPersistenceTests : IDisposable
 
     #region Save Project Tests
 
+    private void FillRequiredFields(MainViewModel vm)
+    {
+        if (string.IsNullOrWhiteSpace(vm.ChangeOrderId)) vm.ChangeOrderId = "CO-TEST-001";
+        if (string.IsNullOrWhiteSpace(vm.ProjectDescription)) vm.ProjectDescription = "Test description";
+        if (string.IsNullOrWhiteSpace(vm.EstimatedBy)) vm.EstimatedBy = "Tester";
+        if (string.IsNullOrWhiteSpace(vm.ReviewedBy)) vm.ReviewedBy = "Reviewer";
+        if (!vm.Components.Any(c => c.ComponentType != ComponentType.None))
+        {
+            vm.AddComponentCommand.Execute(null);
+            vm.Components[^1].ComponentType = ComponentType.MISC;
+            vm.Components[^1].Size = ComponentSize.Small;
+            vm.Components[^1].ChangeType = ChangeType.New;
+            vm.Components[^1].Count = 1;
+        }
+    }
+
     [Fact]
     public void SaveProject_EmptyName_ReturnsError()
     {
@@ -58,6 +74,7 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Test Project";
+        FillRequiredFields(vm);
 
         var result = vm.SaveProject();
 
@@ -71,6 +88,7 @@ public class ProjectPersistenceTests : IDisposable
         vm.ProjectName = "Persistence Test";
         vm.ChangeOrderId = "CO-123";
         vm.ProjectDescription = "A test project";
+        FillRequiredFields(vm);
 
         vm.SaveProject();
 
@@ -83,8 +101,12 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Component Test";
+        vm.ChangeOrderId = "CO-TEST";
+        vm.ProjectDescription = "Test";
+        vm.EstimatedBy = "Tester";
+        vm.ReviewedBy = "Reviewer";
         vm.AddComponentCommand.Execute(null);
-        var row = vm.Components[0];
+        var row = vm.Components[^1];
         row.RequirementId = "REQ-001";
         row.ComponentType = ComponentType.K2Workflow;
         row.Size = ComponentSize.Large;
@@ -109,6 +131,7 @@ public class ProjectPersistenceTests : IDisposable
         var vm = new MainViewModel();
         vm.ProjectName = "Update Test";
         vm.ChangeOrderId = "CO-001";
+        FillRequiredFields(vm);
         vm.SaveProject();
 
         // Change and save again
@@ -126,12 +149,14 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm1 = new MainViewModel();
         vm1.ProjectName = "Unique Project";
+        FillRequiredFields(vm1);
         vm1.SaveProject();
 
         // Same name from another vm instance = should update (not duplicate)
         var vm2 = new MainViewModel();
         vm2.ProjectName = "Unique Project";
         vm2.ChangeOrderId = "NEW-CO";
+        FillRequiredFields(vm2);
         vm2.SaveProject();
 
         var projects = MainViewModel.GetAllProjects();
@@ -144,6 +169,7 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = $"Date Test {Guid.NewGuid():N}";
+        FillRequiredFields(vm);
         vm.SaveProject();
 
         var projects = MainViewModel.GetAllProjects();
@@ -156,6 +182,7 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "User Test";
+        FillRequiredFields(vm);
         vm.SaveProject();
 
         var projects = MainViewModel.GetAllProjects();
@@ -169,6 +196,7 @@ public class ProjectPersistenceTests : IDisposable
         var vm = new MainViewModel();
         vm.ProjectName = "PM Test";
         vm.PmEffortPercentage = 20m;
+        FillRequiredFields(vm);
         vm.SaveProject();
 
         var projects = MainViewModel.GetAllProjects();
@@ -181,11 +209,12 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Totals Test";
+        FillRequiredFields(vm);
         vm.AddComponentCommand.Execute(null);
-        vm.Components[0].ComponentType = ComponentType.MISC;
-        vm.Components[0].Size = ComponentSize.Large;
-        vm.Components[0].ChangeType = ChangeType.New;
-        vm.Components[0].Count = 1;
+        vm.Components[^1].ComponentType = ComponentType.MISC;
+        vm.Components[^1].Size = ComponentSize.Large;
+        vm.Components[^1].ChangeType = ChangeType.New;
+        vm.Components[^1].Count = 1;
         vm.SaveProject();
 
         var projects = MainViewModel.GetAllProjects();
@@ -199,11 +228,12 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "TShirt Test";
+        FillRequiredFields(vm);
         vm.AddComponentCommand.Execute(null);
-        vm.Components[0].ComponentType = ComponentType.MISC;
-        vm.Components[0].Size = ComponentSize.Large;
-        vm.Components[0].ChangeType = ChangeType.New;
-        vm.Components[0].Count = 1;
+        vm.Components[^1].ComponentType = ComponentType.MISC;
+        vm.Components[^1].Size = ComponentSize.Large;
+        vm.Components[^1].ChangeType = ChangeType.New;
+        vm.Components[^1].Count = 1;
         vm.SaveProject();
 
         var projects = MainViewModel.GetAllProjects();
@@ -216,12 +246,25 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Multi Component";
+        vm.ChangeOrderId = "CO-TEST";
+        vm.ProjectDescription = "Test";
+        vm.EstimatedBy = "Tester";
+        vm.ReviewedBy = "Reviewer";
         vm.AddComponentCommand.Execute(null);
         vm.AddComponentCommand.Execute(null);
         vm.AddComponentCommand.Execute(null);
-        vm.Components[0].ComponentType = ComponentType.Reports;
-        vm.Components[1].ComponentType = ComponentType.K2Workflow;
-        vm.Components[2].ComponentType = ComponentType.Webpage;
+        vm.Components[^3].ComponentType = ComponentType.Reports;
+        vm.Components[^3].Size = ComponentSize.Small;
+        vm.Components[^3].ChangeType = ChangeType.New;
+        vm.Components[^3].Count = 1;
+        vm.Components[^2].ComponentType = ComponentType.K2Workflow;
+        vm.Components[^2].Size = ComponentSize.Small;
+        vm.Components[^2].ChangeType = ChangeType.New;
+        vm.Components[^2].Count = 1;
+        vm.Components[^1].ComponentType = ComponentType.Webpage;
+        vm.Components[^1].Size = ComponentSize.Small;
+        vm.Components[^1].ChangeType = ChangeType.New;
+        vm.Components[^1].Count = 1;
         vm.SaveProject();
 
         var projects = MainViewModel.GetAllProjects();
@@ -238,6 +281,7 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Load Name Test";
+        FillRequiredFields(vm);
         vm.SaveProject();
 
         var vm2 = new MainViewModel();
@@ -253,6 +297,7 @@ public class ProjectPersistenceTests : IDisposable
         var vm = new MainViewModel();
         vm.ProjectName = "Load CO Test";
         vm.ChangeOrderId = "CO-999";
+        FillRequiredFields(vm);
         vm.SaveProject();
 
         var vm2 = new MainViewModel();
@@ -268,6 +313,7 @@ public class ProjectPersistenceTests : IDisposable
         var vm = new MainViewModel();
         vm.ProjectName = "Load Desc Test";
         vm.ProjectDescription = "Test description";
+        FillRequiredFields(vm);
         vm.SaveProject();
 
         var vm2 = new MainViewModel();
@@ -282,14 +328,15 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Load PM Test";
-        vm.PmEffortPercentage = 25m;
+        vm.PmEffortPercentage = 19m;
+        FillRequiredFields(vm);
         vm.SaveProject();
 
         var vm2 = new MainViewModel();
         var projects = MainViewModel.GetAllProjects();
         vm2.LoadProject(projects.First(p => p.ProjectName == "Load PM Test"));
 
-        Assert.Equal(25m, vm2.PmEffortPercentage);
+        Assert.Equal(19m, vm2.PmEffortPercentage);
     }
 
     [Fact]
@@ -297,12 +344,16 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Load Components Test";
+        vm.ChangeOrderId = "CO-TEST";
+        vm.ProjectDescription = "Test";
+        vm.EstimatedBy = "Tester";
+        vm.ReviewedBy = "Reviewer";
         vm.AddComponentCommand.Execute(null);
-        vm.Components[0].RequirementId = "R-100";
-        vm.Components[0].ComponentType = ComponentType.Webpage;
-        vm.Components[0].Size = ComponentSize.Medium;
-        vm.Components[0].ChangeType = ChangeType.Change;
-        vm.Components[0].Count = 3;
+        vm.Components[^1].RequirementId = "R-100";
+        vm.Components[^1].ComponentType = ComponentType.Webpage;
+        vm.Components[^1].Size = ComponentSize.Medium;
+        vm.Components[^1].ChangeType = ChangeType.Change;
+        vm.Components[^1].Count = 3;
         vm.SaveProject();
 
         var vm2 = new MainViewModel();
@@ -323,11 +374,12 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Load Recalc Test";
+        FillRequiredFields(vm);
         vm.AddComponentCommand.Execute(null);
-        vm.Components[0].ComponentType = ComponentType.MISC;
-        vm.Components[0].Size = ComponentSize.Large;
-        vm.Components[0].ChangeType = ChangeType.New;
-        vm.Components[0].Count = 1;
+        vm.Components[^1].ComponentType = ComponentType.MISC;
+        vm.Components[^1].Size = ComponentSize.Large;
+        vm.Components[^1].ChangeType = ChangeType.New;
+        vm.Components[^1].Count = 1;
         var originalTotal = vm.GrandTotalHours;
         vm.SaveProject();
 
@@ -343,7 +395,7 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Load Clear Test";
-        vm.AddComponentCommand.Execute(null);
+        FillRequiredFields(vm);
         vm.SaveProject();
 
         // Start a new VM with some components already
@@ -365,8 +417,12 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Load Line Test";
+        FillRequiredFields(vm);
         vm.AddComponentCommand.Execute(null);
-        vm.AddComponentCommand.Execute(null);
+        vm.Components[^1].ComponentType = ComponentType.Reports;
+        vm.Components[^1].Size = ComponentSize.Small;
+        vm.Components[^1].ChangeType = ChangeType.New;
+        vm.Components[^1].Count = 1;
         vm.SaveProject();
 
         var vm2 = new MainViewModel();
@@ -382,17 +438,23 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Load BaseHrs Test";
+        vm.ChangeOrderId = "CO-TEST";
+        vm.ProjectDescription = "Test";
+        vm.EstimatedBy = "Tester";
+        vm.ReviewedBy = "Reviewer";
         vm.AddComponentCommand.Execute(null);
-        vm.Components[0].ComponentType = ComponentType.K2Workflow;
-        vm.Components[0].Size = ComponentSize.Medium;
-        vm.Components[0].ChangeType = ChangeType.New;
-        var expectedBase = vm.Components[0].BaseHoursPerUnit;
+        vm.Components[^1].ComponentType = ComponentType.K2Workflow;
+        vm.Components[^1].Size = ComponentSize.Medium;
+        vm.Components[^1].ChangeType = ChangeType.New;
+        vm.Components[^1].Count = 1;
+        var expectedBase = vm.Components[^1].BaseHoursPerUnit;
         vm.SaveProject();
 
         var vm2 = new MainViewModel();
         var projects = MainViewModel.GetAllProjects();
         vm2.LoadProject(projects.First(p => p.ProjectName == "Load BaseHrs Test"));
 
+        // First component is K2Workflow (only one saved)
         Assert.Equal(expectedBase, vm2.Components[0].BaseHoursPerUnit);
     }
 
@@ -413,10 +475,12 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm1 = new MainViewModel();
         vm1.ProjectName = "Order Test A";
+        FillRequiredFields(vm1);
         vm1.SaveProject();
 
         var vm2 = new MainViewModel();
         vm2.ProjectName = "Order Test B";
+        FillRequiredFields(vm2);
         vm2.SaveProject();
 
         var projects = MainViewModel.GetAllProjects();
@@ -430,8 +494,12 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Include Comp Test";
+        FillRequiredFields(vm);
         vm.AddComponentCommand.Execute(null);
-        vm.AddComponentCommand.Execute(null);
+        vm.Components[^1].ComponentType = ComponentType.Reports;
+        vm.Components[^1].Size = ComponentSize.Small;
+        vm.Components[^1].ChangeType = ChangeType.New;
+        vm.Components[^1].Count = 1;
         vm.SaveProject();
 
         var projects = MainViewModel.GetAllProjects();
@@ -493,10 +561,15 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Enum String Test";
+        vm.ChangeOrderId = "CO-TEST";
+        vm.ProjectDescription = "Test";
+        vm.EstimatedBy = "Tester";
+        vm.ReviewedBy = "Reviewer";
         vm.AddComponentCommand.Execute(null);
-        vm.Components[0].ComponentType = ComponentType.ProgramsDBStoredProcs;
-        vm.Components[0].Size = ComponentSize.Large;
-        vm.Components[0].ChangeType = ChangeType.Change;
+        vm.Components[^1].ComponentType = ComponentType.ProgramsDBStoredProcs;
+        vm.Components[^1].Size = ComponentSize.Large;
+        vm.Components[^1].ChangeType = ChangeType.Change;
+        vm.Components[^1].Count = 1;
         vm.SaveProject();
 
         var projects = MainViewModel.GetAllProjects();
@@ -515,7 +588,7 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Delete Test";
-        vm.AddComponentCommand.Execute(null);
+        FillRequiredFields(vm);
         vm.SaveProject();
 
         var projects = MainViewModel.GetAllProjects();
@@ -535,8 +608,12 @@ public class ProjectPersistenceTests : IDisposable
     {
         var vm = new MainViewModel();
         vm.ProjectName = "Cascade Test";
+        FillRequiredFields(vm);
         vm.AddComponentCommand.Execute(null);
-        vm.AddComponentCommand.Execute(null);
+        vm.Components[^1].ComponentType = ComponentType.Reports;
+        vm.Components[^1].Size = ComponentSize.Small;
+        vm.Components[^1].ChangeType = ChangeType.New;
+        vm.Components[^1].Count = 1;
         vm.SaveProject();
 
         var projects = MainViewModel.GetAllProjects();
