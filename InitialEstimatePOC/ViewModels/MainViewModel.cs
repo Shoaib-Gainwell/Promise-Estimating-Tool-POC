@@ -31,9 +31,6 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private decimal _pmEffortPercentage = 15m;
 
-    [ObservableProperty]
-    private decimal _pmReservePercentage = 5m;
-
     // Tracks the loaded project's ID (null = new unsaved project)
     private string? _currentProjectId;
 
@@ -64,9 +61,6 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private decimal _projectManagementHours;
-
-    [ObservableProperty]
-    private decimal _pmReserveHours;
 
     [ObservableProperty]
     private decimal _subtotalHours;
@@ -143,6 +137,54 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private decimal _collaborationTotalHours;
 
+    // Per-type collaboration hours (calculated from Collaboration tab)
+    [ObservableProperty]
+    private decimal _wprsHours;
+
+    [ObservableProperty]
+    private decimal _clientMeetingsHours;
+
+    [ObservableProperty]
+    private decimal _internalMeetingsHours;
+
+    [ObservableProperty]
+    private decimal _automationTestCollabHours;
+
+    [ObservableProperty]
+    private decimal _consultantMentorHours;
+
+    // Per-type collaboration adjusted hours
+    [ObservableProperty]
+    private decimal _wprsAdjustedHours;
+
+    [ObservableProperty]
+    private decimal _clientMeetingsAdjustedHours;
+
+    [ObservableProperty]
+    private decimal _internalMeetingsAdjustedHours;
+
+    [ObservableProperty]
+    private decimal _automationTestCollabAdjustedHours;
+
+    [ObservableProperty]
+    private decimal _consultantMentorAdjustedHours;
+
+    // Per-type collaboration totals (calculated + adjusted)
+    [ObservableProperty]
+    private decimal _wprsTotalHours;
+
+    [ObservableProperty]
+    private decimal _clientMeetingsTotalHours;
+
+    [ObservableProperty]
+    private decimal _internalMeetingsTotalHours;
+
+    [ObservableProperty]
+    private decimal _automationTestCollabTotalHours;
+
+    [ObservableProperty]
+    private decimal _consultantMentorTotalHours;
+
     // === Assumptions ===
     [ObservableProperty]
     private string _seAssumptions = string.Empty;
@@ -215,13 +257,58 @@ public partial class MainViewModel : ObservableObject
     public Array Sizes => Enum.GetValues<ComponentSize>();
     public Array CollaborationTypes => Enum.GetValues<CollaborationType>();
 
-    /// <summary>PM Effort % dropdown options matching Excel: 5, 10, 15, 20, 25</summary>
-    public decimal[] PmEffortOptions => new decimal[] { 5m, 10m, 15m, 20m, 25m };
+    /// <summary>PM Effort % dropdown options matching Excel J34: 1–20</summary>
+    public decimal[] PmEffortOptions => Enumerable.Range(1, 20).Select(i => (decimal)i).ToArray();
+
+    /// <summary>Number of Meetings / WPRs dropdown matching Excel J36:J42 validation: 0–20</summary>
+    public int[] MeetingCountOptions => Enumerable.Range(0, 21).ToArray();
+
+    /// <summary>Meeting Duration (In Mins) dropdown matching Excel K36:K39 validation: 0,15,30,45,60</summary>
+    public int[] MeetingDurationOptions => new[] { 0, 15, 30, 45, 60 };
+
+    /// <summary>Number of Participants dropdown matching Excel L36:L42 validation: 0–20</summary>
+    public int[] ParticipantCountOptions => Enumerable.Range(0, 21).ToArray();
+
+    /// <summary>Participant Prep Time (In Mins) dropdown matching Excel M36:M39 validation: 0,15,30,...,180</summary>
+    public int[] PrepTimeOptions => Enumerable.Range(0, 13).Select(i => i * 15).ToArray();
+
+    /// <summary>
+    /// True when at least one component row has all required columns filled:
+    /// Req#, Component Type, New/Change, Size, and Count > 0.
+    /// Used to enable the Collaboration tab.
+    /// </summary>
+    public bool HasValidComponents => Components.Any(c =>
+        !string.IsNullOrWhiteSpace(c.RequirementId) &&
+        c.ComponentType != ComponentType.None &&
+        c.ChangeType != ChangeType.None &&
+        c.Size != ComponentSize.None &&
+        c.Count > 0);
 
     public MainViewModel()
     {
-        Components.CollectionChanged += (_, _) => Recalculate();
+        Components.CollectionChanged += (_, e) =>
+        {
+            if (e.NewItems != null)
+                foreach (ComponentRowViewModel row in e.NewItems)
+                    row.PropertyChanged += OnComponentRowPropertyChanged;
+            if (e.OldItems != null)
+                foreach (ComponentRowViewModel row in e.OldItems)
+                    row.PropertyChanged -= OnComponentRowPropertyChanged;
+            Recalculate();
+            OnPropertyChanged(nameof(HasValidComponents));
+        };
         CollaborationItems.CollectionChanged += (_, _) => Recalculate();
+        InitializeDefaultCollaborationItems();
+    }
+
+    private void OnComponentRowPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ComponentRowViewModel.RequirementId) ||
+            e.PropertyName == nameof(ComponentRowViewModel.ComponentType) ||
+            e.PropertyName == nameof(ComponentRowViewModel.ChangeType) ||
+            e.PropertyName == nameof(ComponentRowViewModel.Size) ||
+            e.PropertyName == nameof(ComponentRowViewModel.Count))
+            OnPropertyChanged(nameof(HasValidComponents));
     }
 
     /// <summary>
@@ -232,11 +319,10 @@ public partial class MainViewModel : ObservableObject
     {
         var defaults = new[]
         {
-            new { Type = CollaborationType.WPRs, Name = "WPRs", Meetings = 10, Duration = 60, Participants = 3, PrepTime = 15 },
-            new { Type = CollaborationType.ClientMeetings, Name = "Client Meetings", Meetings = 5, Duration = 60, Participants = 3, PrepTime = 15 },
-            new { Type = CollaborationType.InternalMeetings, Name = "Internal Meetings", Meetings = 5, Duration = 60, Participants = 3, PrepTime = 15 },
-            new { Type = CollaborationType.AutomationTestCollaboration, Name = "Automation Test Collaboration", Meetings = 5, Duration = 60, Participants = 3, PrepTime = 15 },
-            new { Type = CollaborationType.ConsultantMentorEffort, Name = "Consultant/Mentor Effort", Meetings = 0, Duration = 0, Participants = 0, PrepTime = 0 },
+            new { Type = CollaborationType.WPRs, Name = "WPRs" },
+            new { Type = CollaborationType.ClientMeetings, Name = "Client Meetings" },
+            new { Type = CollaborationType.InternalMeetings, Name = "Internal Meetings" },
+            new { Type = CollaborationType.AutomationTestCollaboration, Name = "Automation Test Collaboration" },
         };
 
         for (int i = 0; i < defaults.Length; i++)
@@ -247,10 +333,10 @@ public partial class MainViewModel : ObservableObject
                 LineNumber = i + 1,
                 TaskName = d.Name,
                 CollabType = d.Type,
-                NumberOfMeetings = d.Meetings,
-                MeetingDurationMinutes = d.Duration,
-                NumberOfParticipants = d.Participants,
-                ParticipantPrepTimeMinutes = d.PrepTime
+                NumberOfMeetings = 0,
+                MeetingDurationMinutes = 0,
+                NumberOfParticipants = 0,
+                ParticipantPrepTimeMinutes = 0
             };
             row.PropertyChanged += OnCollaborationChanged;
             CollaborationItems.Add(row);
@@ -293,6 +379,7 @@ public partial class MainViewModel : ObservableObject
         foreach (var item in CollaborationItems)
             item.PropertyChanged -= OnCollaborationChanged;
         CollaborationItems.Clear();
+        InitializeDefaultCollaborationItems();
 
         // Reset header fields
         ProjectName = string.Empty;
@@ -304,7 +391,6 @@ public partial class MainViewModel : ObservableObject
 
         // Reset PM configuration to defaults
         PmEffortPercentage = 15m;
-        PmReservePercentage = 5m;
 
         // Reset adjusted hours
         DevelopmentAdjustedHours = 0m;
@@ -316,6 +402,11 @@ public partial class MainViewModel : ObservableObject
         ProductionValidationAdjustedHours = 0m;
         ProjectManagementAdjustedHours = 0m;
         CollaborationAdjustedHours = 0m;
+        WprsAdjustedHours = 0m;
+        ClientMeetingsAdjustedHours = 0m;
+        InternalMeetingsAdjustedHours = 0m;
+        AutomationTestCollabAdjustedHours = 0m;
+        ConsultantMentorAdjustedHours = 0m;
         AdjustedHoursComments = string.Empty;
 
         // Reset assumptions
@@ -330,7 +421,7 @@ public partial class MainViewModel : ObservableObject
         TestCasesMedium = 0;
         TestCasesComplex = 0;
         TestCasesVeryComplex = 0;
-        TestCaseIterations = 1;
+        TestCaseIterations = 0;
 
         // Reset actual hours
         TotalActualHours = 0m;
@@ -347,10 +438,10 @@ public partial class MainViewModel : ObservableObject
         var row = new CollaborationRowViewModel
         {
             LineNumber = CollaborationItems.Count + 1,
-            NumberOfMeetings = 5,
-            MeetingDurationMinutes = 60,
-            NumberOfParticipants = 3,
-            ParticipantPrepTimeMinutes = 15
+            NumberOfMeetings = 0,
+            MeetingDurationMinutes = 0,
+            NumberOfParticipants = 0,
+            ParticipantPrepTimeMinutes = 0
         };
         row.PropertyChanged += OnCollaborationChanged;
         CollaborationItems.Add(row);
@@ -394,7 +485,6 @@ public partial class MainViewModel : ObservableObject
     }
 
     partial void OnPmEffortPercentageChanged(decimal value) => Recalculate();
-    partial void OnPmReservePercentageChanged(decimal value) => Recalculate();
     partial void OnDevelopmentAdjustedHoursChanged(decimal value) => Recalculate();
     partial void OnAnalysisAdjustedHoursChanged(decimal value) => Recalculate();
     partial void OnBusinessDesignAdjustedHoursChanged(decimal value) => Recalculate();
@@ -404,6 +494,11 @@ public partial class MainViewModel : ObservableObject
     partial void OnProductionValidationAdjustedHoursChanged(decimal value) => Recalculate();
     partial void OnProjectManagementAdjustedHoursChanged(decimal value) => Recalculate();
     partial void OnCollaborationAdjustedHoursChanged(decimal value) => Recalculate();
+    partial void OnWprsAdjustedHoursChanged(decimal value) => Recalculate();
+    partial void OnClientMeetingsAdjustedHoursChanged(decimal value) => Recalculate();
+    partial void OnInternalMeetingsAdjustedHoursChanged(decimal value) => Recalculate();
+    partial void OnAutomationTestCollabAdjustedHoursChanged(decimal value) => Recalculate();
+    partial void OnConsultantMentorAdjustedHoursChanged(decimal value) => Recalculate();
     partial void OnUseTestCasesForEstimateChanged(bool value) => Recalculate();
     partial void OnTestCasesSimpleChanged(int value) => Recalculate();
     partial void OnTestCasesMediumChanged(int value) => Recalculate();
@@ -479,12 +574,37 @@ public partial class MainViewModel : ObservableObject
         ProjectManagementHours = RoundUp(allEffectiveTasks * (PmEffortPercentage / 100m));
         decimal effectivePM = ProjectManagementHours + ProjectManagementAdjustedHours;
 
-        // Step 9: Collaboration = sum of all collaboration items
+        // Step 9: Collaboration = sum of all collaboration items (also split by type)
         decimal collab = 0m;
+        decimal wprs = 0m, clientMtg = 0m, internalMtg = 0m, autoTest = 0m, consultant = 0m;
         foreach (var item in CollaborationItems)
+        {
             collab += item.TotalHours;
-        TotalCollaborationHours = collab;
-        decimal effectiveCollab = collab + CollaborationAdjustedHours;
+            switch (item.CollabType)
+            {
+                case CollaborationType.WPRs:                      wprs       += item.TotalHours; break;
+                case CollaborationType.ClientMeetings:            clientMtg  += item.TotalHours; break;
+                case CollaborationType.InternalMeetings:          internalMtg+= item.TotalHours; break;
+                case CollaborationType.AutomationTestCollaboration:autoTest  += item.TotalHours; break;
+            }
+        }
+        TotalCollaborationHours   = collab;
+        WprsHours                 = wprs;
+        ClientMeetingsHours       = clientMtg;
+        InternalMeetingsHours     = internalMtg;
+        AutomationTestCollabHours = autoTest;
+        ConsultantMentorHours     = consultant;
+
+        // Per-type totals = calculated + per-type adjusted
+        WprsTotalHours                 = wprs     + WprsAdjustedHours;
+        ClientMeetingsTotalHours       = clientMtg + ClientMeetingsAdjustedHours;
+        InternalMeetingsTotalHours     = internalMtg + InternalMeetingsAdjustedHours;
+        AutomationTestCollabTotalHours = autoTest  + AutomationTestCollabAdjustedHours;
+        ConsultantMentorTotalHours     = consultant + ConsultantMentorAdjustedHours;
+
+        // Effective collab = sum of all per-type totals (replaces old collab + CollaborationAdjustedHours)
+        decimal effectiveCollab = WprsTotalHours + ClientMeetingsTotalHours + InternalMeetingsTotalHours
+                                + AutomationTestCollabTotalHours + ConsultantMentorTotalHours;
 
         // Per-task totals (effective = calculated + adjusted, shown in UI)
         DevelopmentTotalHours = effectiveDev;
@@ -506,17 +626,13 @@ public partial class MainViewModel : ObservableObject
         // When no components and no adjusted dev hours exist, don't show totals in summary
         if (ComponentCount == 0 && effectiveDev == 0m)
         {
-            PmReserveHours = 0m;
             GrandTotalHours = 0m;
             TShirtSize = "—";
         }
         else
         {
-            // Step 11: PM Reserve = ROUNDUP(Subtotal * Reserve%, 2)
-            PmReserveHours = RoundUp(SubtotalHours * (PmReservePercentage / 100m));
-
-            // Step 12: Grand Total = Subtotal + PM Reserve, rounded up to whole number
-            GrandTotalHours = Math.Ceiling(SubtotalHours + PmReserveHours);
+            // Grand Total = Subtotal rounded up to whole number (matches Excel I3 = ROUNDUP(I43,0))
+            GrandTotalHours = Math.Ceiling(SubtotalHours);
 
             // T-Shirt Size
             TShirtSize = WeightedValues.GetTShirtSize(GrandTotalHours);
@@ -563,6 +679,16 @@ public partial class MainViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(ProjectName))
             return "Project Name is required.";
+        if (string.IsNullOrWhiteSpace(ChangeOrderId))
+            return "CO / Defect # is required.";
+        if (string.IsNullOrWhiteSpace(ProjectDescription))
+            return "Description is required.";
+        if (string.IsNullOrWhiteSpace(EstimatedBy))
+            return "Estimated By is required.";
+        if (string.IsNullOrWhiteSpace(ReviewedBy))
+            return "Reviewed By is required.";
+        if (!Components.Any(c => c.ComponentType != ComponentType.None))
+            return "At least one component must be added before saving.";
 
         using var db = new EstimateDbContext();
         try { db.Database.EnsureCreated(); }
@@ -585,7 +711,6 @@ public partial class MainViewModel : ObservableObject
             existing.EstimatedBy = EstimatedBy;
             existing.ReviewedBy = ReviewedBy;
             existing.PmEffortPercentage = PmEffortPercentage;
-            existing.PmReservePercentage = PmReservePercentage;
             existing.TotalDevelopmentHours = TotalDevelopmentHours;
             existing.GrandTotalHours = GrandTotalHours;
             existing.TShirtSize = TShirtSize;
@@ -599,6 +724,11 @@ public partial class MainViewModel : ObservableObject
             existing.ProductionValidationAdjustedHours = ProductionValidationAdjustedHours;
             existing.ProjectManagementAdjustedHours = ProjectManagementAdjustedHours;
             existing.CollaborationAdjustedHours = CollaborationAdjustedHours;
+            existing.WprsAdjustedHours = WprsAdjustedHours;
+            existing.ClientMeetingsAdjustedHours = ClientMeetingsAdjustedHours;
+            existing.InternalMeetingsAdjustedHours = InternalMeetingsAdjustedHours;
+            existing.AutomationTestCollabAdjustedHours = AutomationTestCollabAdjustedHours;
+            existing.ConsultantMentorAdjustedHours = ConsultantMentorAdjustedHours;
             existing.SeAdjustedHours = DevelopmentAdjustedHours; // backward compat
             existing.BaAdjustedHours = AnalysisAdjustedHours; // backward compat
             existing.SeAssumptions = SeAssumptions;
@@ -636,7 +766,6 @@ public partial class MainViewModel : ObservableObject
                 EstimatedBy = EstimatedBy,
                 ReviewedBy = ReviewedBy,
                 PmEffortPercentage = PmEffortPercentage,
-                PmReservePercentage = PmReservePercentage,
                 TotalDevelopmentHours = TotalDevelopmentHours,
                 GrandTotalHours = GrandTotalHours,
                 TShirtSize = TShirtSize,
@@ -650,6 +779,11 @@ public partial class MainViewModel : ObservableObject
                 ProductionValidationAdjustedHours = ProductionValidationAdjustedHours,
                 ProjectManagementAdjustedHours = ProjectManagementAdjustedHours,
                 CollaborationAdjustedHours = CollaborationAdjustedHours,
+                WprsAdjustedHours = WprsAdjustedHours,
+                ClientMeetingsAdjustedHours = ClientMeetingsAdjustedHours,
+                InternalMeetingsAdjustedHours = InternalMeetingsAdjustedHours,
+                AutomationTestCollabAdjustedHours = AutomationTestCollabAdjustedHours,
+                ConsultantMentorAdjustedHours = ConsultantMentorAdjustedHours,
                 SeAdjustedHours = DevelopmentAdjustedHours, // backward compat
                 BaAdjustedHours = AnalysisAdjustedHours, // backward compat
                 SeAssumptions = SeAssumptions,
@@ -682,6 +816,7 @@ public partial class MainViewModel : ObservableObject
         var list = new List<ComponentEntryEntity>();
         foreach (var c in Components)
         {
+            if (c.ComponentType == ComponentType.None) continue; // skip unselected placeholder rows
             list.Add(new ComponentEntryEntity
             {
                 ProjectId = projectId,
@@ -739,7 +874,6 @@ public partial class MainViewModel : ObservableObject
         EstimatedBy = project.EstimatedBy;
         ReviewedBy = project.ReviewedBy;
         PmEffortPercentage = project.PmEffortPercentage;
-        PmReservePercentage = project.PmReservePercentage;
         DevelopmentAdjustedHours = project.DevelopmentAdjustedHours != 0 ? project.DevelopmentAdjustedHours : project.SeAdjustedHours;
         AnalysisAdjustedHours = project.AnalysisAdjustedHours != 0 ? project.AnalysisAdjustedHours : project.BaAdjustedHours;
         BusinessDesignAdjustedHours = project.BusinessDesignAdjustedHours;
@@ -749,6 +883,11 @@ public partial class MainViewModel : ObservableObject
         ProductionValidationAdjustedHours = project.ProductionValidationAdjustedHours;
         ProjectManagementAdjustedHours = project.ProjectManagementAdjustedHours;
         CollaborationAdjustedHours = project.CollaborationAdjustedHours;
+        WprsAdjustedHours = project.WprsAdjustedHours;
+        ClientMeetingsAdjustedHours = project.ClientMeetingsAdjustedHours;
+        InternalMeetingsAdjustedHours = project.InternalMeetingsAdjustedHours;
+        AutomationTestCollabAdjustedHours = project.AutomationTestCollabAdjustedHours;
+        ConsultantMentorAdjustedHours = project.ConsultantMentorAdjustedHours;
         SeAssumptions = project.SeAssumptions;
         BaAssumptions = project.BaAssumptions;
         CollaborationAssumptions = project.CollaborationAssumptions;
@@ -782,21 +921,29 @@ public partial class MainViewModel : ObservableObject
             Components.Add(row);
         }
 
-        foreach (var entry in project.CollaborationItems.OrderBy(c => c.LineNumber))
+        var savedCollab = project.CollaborationItems.OrderBy(c => c.LineNumber).ToList();
+        if (savedCollab.Count > 0)
         {
-            var row = new CollaborationRowViewModel
+            foreach (var entry in savedCollab)
             {
-                LineNumber = entry.LineNumber,
-                TaskName = entry.TaskName,
-                CollabType = Enum.TryParse<CollaborationType>(entry.CollaborationType, out var ct) ? ct : CollaborationType.WPRs,
-                NumberOfMeetings = entry.NumberOfMeetings,
-                MeetingDurationMinutes = entry.MeetingDurationMinutes,
-                NumberOfParticipants = entry.NumberOfParticipants,
-                ParticipantPrepTimeMinutes = entry.ParticipantPrepTimeMinutes,
-                Notes = entry.Notes
-            };
-            row.PropertyChanged += OnCollaborationChanged;
-            CollaborationItems.Add(row);
+                var row = new CollaborationRowViewModel
+                {
+                    LineNumber = entry.LineNumber,
+                    TaskName = entry.TaskName,
+                    CollabType = Enum.TryParse<CollaborationType>(entry.CollaborationType, out var ct) ? ct : CollaborationType.WPRs,
+                    NumberOfMeetings = entry.NumberOfMeetings,
+                    MeetingDurationMinutes = entry.MeetingDurationMinutes,
+                    NumberOfParticipants = entry.NumberOfParticipants,
+                    ParticipantPrepTimeMinutes = entry.ParticipantPrepTimeMinutes,
+                    Notes = entry.Notes
+                };
+                row.PropertyChanged += OnCollaborationChanged;
+                CollaborationItems.Add(row);
+            }
+        }
+        else
+        {
+            InitializeDefaultCollaborationItems();
         }
 
         Recalculate();
@@ -823,19 +970,19 @@ public partial class ComponentRowViewModel : ObservableObject
     private string _requirementId = string.Empty;
 
     [ObservableProperty]
-    private ComponentType _componentType;
+    private ComponentType _componentType = ComponentType.None;
 
     [ObservableProperty]
     private string _description = string.Empty;
 
     [ObservableProperty]
-    private ChangeType _changeType;
+    private ChangeType _changeType = ChangeType.None;
 
     [ObservableProperty]
-    private ComponentSize _size;
+    private ComponentSize _size = ComponentSize.None;
 
     [ObservableProperty]
-    private int _count = 1;
+    private int _count = 0;
 
     [ObservableProperty]
     private decimal _baseHoursPerUnit;
@@ -847,6 +994,12 @@ public partial class ComponentRowViewModel : ObservableObject
 
     public void UpdateBaseHours()
     {
+        if (ComponentType == ComponentType.None || Size == ComponentSize.None || ChangeType == ChangeType.None)
+        {
+            BaseHoursPerUnit = 0m;
+            OnPropertyChanged(nameof(TotalHours));
+            return;
+        }
         BaseHoursPerUnit = WeightedValues.GetBaseHours(ComponentType, Size, ChangeType);
         OnPropertyChanged(nameof(TotalHours));
     }

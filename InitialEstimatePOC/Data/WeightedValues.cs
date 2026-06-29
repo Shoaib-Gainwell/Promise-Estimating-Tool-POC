@@ -155,6 +155,7 @@ public static class WeightedValues
     /// </summary>
     public static string GetDisplayName(ComponentType type) => type switch
     {
+        ComponentType.None => "— Select —",
         ComponentType.PowerBuilderWindows => "PowerBuilder Windows",
         ComponentType.Reports => "Reports",
         ComponentType.ProgramsDBStoredProcs => "Programs/DB Stored Procedures",

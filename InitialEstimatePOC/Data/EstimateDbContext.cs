@@ -58,6 +58,11 @@ public class EstimateDbContext : DbContext
             entity.Property(e => e.SeAdjustedHours).HasColumnName("SE_ADJUSTED_HOURS").HasColumnType("REAL");
             entity.Property(e => e.BaAdjustedHours).HasColumnName("BA_ADJUSTED_HOURS").HasColumnType("REAL");
             entity.Property(e => e.CollaborationAdjustedHours).HasColumnName("COLLAB_ADJUSTED_HOURS").HasColumnType("REAL");
+            entity.Property(e => e.WprsAdjustedHours).HasColumnName("WPRS_ADJUSTED_HOURS").HasColumnType("REAL");
+            entity.Property(e => e.ClientMeetingsAdjustedHours).HasColumnName("CLIENT_MTG_ADJUSTED_HOURS").HasColumnType("REAL");
+            entity.Property(e => e.InternalMeetingsAdjustedHours).HasColumnName("INTERNAL_MTG_ADJUSTED_HOURS").HasColumnType("REAL");
+            entity.Property(e => e.AutomationTestCollabAdjustedHours).HasColumnName("AUTO_TEST_ADJUSTED_HOURS").HasColumnType("REAL");
+            entity.Property(e => e.ConsultantMentorAdjustedHours).HasColumnName("CONSULTANT_ADJUSTED_HOURS").HasColumnType("REAL");
             entity.Property(e => e.DevelopmentAdjustedHours).HasColumnName("DEV_ADJUSTED_HOURS").HasColumnType("REAL");
             entity.Property(e => e.AnalysisAdjustedHours).HasColumnName("ANALYSIS_ADJUSTED_HOURS").HasColumnType("REAL");
             entity.Property(e => e.BusinessDesignAdjustedHours).HasColumnName("BIZ_DESIGN_ADJUSTED_HOURS").HasColumnType("REAL");

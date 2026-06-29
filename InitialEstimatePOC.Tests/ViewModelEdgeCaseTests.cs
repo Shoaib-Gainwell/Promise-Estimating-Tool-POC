@@ -349,7 +349,7 @@ public class ViewModelEdgeCaseTests
     }
 
     [Fact]
-    public void MainViewModel_GrandTotal_EqualsSubtotalPlusPMReserve()
+    public void MainViewModel_GrandTotal_EqualsCeilingOfSubtotal()
     {
         var vm = new MainViewModel();
         vm.AddComponentCommand.Execute(null);
@@ -357,9 +357,9 @@ public class ViewModelEdgeCaseTests
         vm.Components[0].Size = ComponentSize.Large;
         vm.Components[0].ChangeType = ChangeType.New;
 
-        // Grand Total = Math.Ceiling(Subtotal + PM Reserve)
+        // Grand Total = Math.Ceiling(Subtotal)
         // Subtotal includes Dev + Derived + PM Effort + Collaboration + Adjusted
-        Assert.Equal(Math.Ceiling(vm.SubtotalHours + vm.PmReserveHours), vm.GrandTotalHours);
+        Assert.Equal(Math.Ceiling(vm.SubtotalHours), vm.GrandTotalHours);
     }
 
     [Fact]

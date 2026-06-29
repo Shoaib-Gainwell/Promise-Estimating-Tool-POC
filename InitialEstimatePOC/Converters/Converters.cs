@@ -65,6 +65,7 @@ public class EnumDisplayConverter : IValueConverter
 {
     private static readonly Dictionary<ComponentType, string> ComponentTypeNames = new()
     {
+        [ComponentType.None] = "— Select —",
         [ComponentType.PowerBuilderWindows] = "PowerBuilder Windows",
         [ComponentType.Reports] = "Reports",
         [ComponentType.ProgramsDBStoredProcs] = "Programs/DB Stored Procedures",
@@ -84,7 +85,6 @@ public class EnumDisplayConverter : IValueConverter
         [CollaborationType.ClientMeetings] = "Client Meetings",
         [CollaborationType.InternalMeetings] = "Internal Meetings",
         [CollaborationType.AutomationTestCollaboration] = "Automation Test Collaboration",
-        [CollaborationType.ConsultantMentorEffort] = "Consultant / Mentor Effort",
     };
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -94,9 +94,9 @@ public class EnumDisplayConverter : IValueConverter
         if (value is CollaborationType clt && CollaborationTypeNames.TryGetValue(clt, out var cltName))
             return cltName;
         if (value is ChangeType chg)
-            return chg.ToString();
+            return chg == ChangeType.None ? "— Select —" : chg.ToString();
         if (value is ComponentSize sz)
-            return sz.ToString();
+            return sz == ComponentSize.None ? "— Select —" : sz.ToString();
         return value?.ToString() ?? string.Empty;
     }
 

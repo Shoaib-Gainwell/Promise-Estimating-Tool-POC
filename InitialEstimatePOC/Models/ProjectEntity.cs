@@ -27,8 +27,8 @@ public class ProjectEntity
     /// <summary>Oracle: PM_EFFORT_PERCENTAGE NUMBER(5,2)</summary>
     public decimal PmEffortPercentage { get; set; } = 15m;
 
-    /// <summary>Oracle: PM_RESERVE_PERCENTAGE NUMBER(5,2)</summary>
-    public decimal PmReservePercentage { get; set; } = 5m;
+    /// <summary>Legacy column — kept to satisfy NOT NULL constraint in existing databases. Always 0.</summary>
+    public decimal PmReservePercentage { get; set; } = 0m;
 
     /// <summary>Oracle: TOTAL_DEVELOPMENT_HOURS NUMBER(10,2)</summary>
     public decimal TotalDevelopmentHours { get; set; }
@@ -52,6 +52,12 @@ public class ProjectEntity
 
     /// <summary>Oracle: COLLABORATION_ADJUSTED_HOURS NUMBER(10,2)</summary>
     public decimal CollaborationAdjustedHours { get; set; }
+
+    public decimal WprsAdjustedHours { get; set; }
+    public decimal ClientMeetingsAdjustedHours { get; set; }
+    public decimal InternalMeetingsAdjustedHours { get; set; }
+    public decimal AutomationTestCollabAdjustedHours { get; set; }
+    public decimal ConsultantMentorAdjustedHours { get; set; }
 
     public decimal DevelopmentAdjustedHours { get; set; }
     public decimal AnalysisAdjustedHours { get; set; }
