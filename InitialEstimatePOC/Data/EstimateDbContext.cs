@@ -80,11 +80,11 @@ public class EstimateDbContext : DbContext
             entity.Property(e => e.ActualHoursAsOfDate).HasColumnName("ACTUAL_HOURS_AS_OF_DATE");
             entity.Property(e => e.TimeForEstimates).HasColumnName("TIME_FOR_ESTIMATES").HasColumnType("REAL");
             entity.Property(e => e.UseTestCasesForEstimate).HasColumnName("USE_TEST_CASES");
-            entity.Property(e => e.TestCasesSimple).HasColumnName("TEST_CASES_SIMPLE");
-            entity.Property(e => e.TestCasesMedium).HasColumnName("TEST_CASES_MEDIUM");
-            entity.Property(e => e.TestCasesComplex).HasColumnName("TEST_CASES_COMPLEX");
-            entity.Property(e => e.TestCasesVeryComplex).HasColumnName("TEST_CASES_VERY_COMPLEX");
-            entity.Property(e => e.TestCaseIterations).HasColumnName("TEST_CASE_ITERATIONS");
+            entity.Property(e => e.TestCasesSimple).HasColumnName("TEST_CASES_SIMPLE").HasColumnType("REAL");
+            entity.Property(e => e.TestCasesMedium).HasColumnName("TEST_CASES_MEDIUM").HasColumnType("REAL");
+            entity.Property(e => e.TestCasesComplex).HasColumnName("TEST_CASES_COMPLEX").HasColumnType("REAL");
+            entity.Property(e => e.TestCasesVeryComplex).HasColumnName("TEST_CASES_VERY_COMPLEX").HasColumnType("REAL");
+            entity.Property(e => e.TestCaseIterations).HasColumnName("TEST_CASE_ITERATIONS").HasColumnType("REAL");
             entity.Property(e => e.CreatedDate).HasColumnName("CREATED_DATE");
             entity.Property(e => e.LastModifiedDate).HasColumnName("LAST_MODIFIED_DATE");
             entity.Property(e => e.CreatedBy).HasColumnName("CREATED_BY").HasMaxLength(100);

@@ -24,7 +24,40 @@ public static class DatabaseSeeder
             catch { /* column already exists — ignore */ }
         }
 
-        if (db.WeightedValues.Any()) return;
+        if (db.WeightedValues.Any())
+        {
+            // Correct any previously-seeded values that were stored with reduced precision.
+            // Maps (ComponentType, Size, ChangeType) -> correct base hours from Excel.
+            var corrections = new Dictionary<(ComponentType, ComponentSize, ChangeType), decimal>
+            {
+                { (ComponentType.ProgramsDBStoredProcs, ComponentSize.Large,  ChangeType.Change), 235.525m  },
+                { (ComponentType.SupportModules,         ComponentSize.Small,  ChangeType.Change), 4.0625m   },
+                { (ComponentType.SupportModules,         ComponentSize.Medium, ChangeType.New),   11.875m   },
+                { (ComponentType.SupportModules,         ComponentSize.Medium, ChangeType.Change), 9.6875m  },
+                { (ComponentType.SupportModules,         ComponentSize.Large,  ChangeType.New),   26.875m   },
+                { (ComponentType.SupportModules,         ComponentSize.Large,  ChangeType.Change), 21.5625m },
+                { (ComponentType.DBManipulation,         ComponentSize.Small,  ChangeType.New),    5.9375m  },
+                { (ComponentType.DBManipulation,         ComponentSize.Small,  ChangeType.Change), 4.6875m  },
+                { (ComponentType.DBManipulation,         ComponentSize.Medium, ChangeType.Change), 11.875m  },
+                { (ComponentType.DBManipulation,         ComponentSize.Large,  ChangeType.New),   31.875m   },
+                { (ComponentType.DBManipulation,         ComponentSize.Large,  ChangeType.Change), 25.625m  },
+                { (ComponentType.DatabaseReview,         ComponentSize.Small,  ChangeType.New),    8.125m   },
+                { (ComponentType.DatabaseReview,         ComponentSize.Medium, ChangeType.New),    8.125m   },
+                { (ComponentType.DatabaseReview,         ComponentSize.Large,  ChangeType.New),    8.125m   },
+            };
+            bool changed = false;
+            foreach (var wv in db.WeightedValues.ToList())
+            {
+                if (corrections.TryGetValue((wv.ComponentType, wv.Size, wv.ChangeType), out var correct)
+                    && wv.BaseHours != correct)
+                {
+                    wv.BaseHours = correct;
+                    changed = true;
+                }
+            }
+            if (changed) db.SaveChanges();
+            return;
+        }
         db.WeightedValues.AddRange(GetDefaultValues());
         db.SaveChanges();
     }
@@ -53,24 +86,24 @@ public static class DatabaseSeeder
         A(ComponentType.ProgramsDBStoredProcs, ComponentSize.Medium, ChangeType.New, 115.00m);
         A(ComponentType.ProgramsDBStoredProcs, ComponentSize.Medium, ChangeType.Change, 92.00m);
         A(ComponentType.ProgramsDBStoredProcs, ComponentSize.Large, ChangeType.New, 294.40m);
-        A(ComponentType.ProgramsDBStoredProcs, ComponentSize.Large, ChangeType.Change, 235.53m);
+        A(ComponentType.ProgramsDBStoredProcs, ComponentSize.Large, ChangeType.Change, 235.525m);
         A(ComponentType.SupportModules, ComponentSize.Small, ChangeType.New, 5.00m);
-        A(ComponentType.SupportModules, ComponentSize.Small, ChangeType.Change, 4.06m);
-        A(ComponentType.SupportModules, ComponentSize.Medium, ChangeType.New, 11.88m);
-        A(ComponentType.SupportModules, ComponentSize.Medium, ChangeType.Change, 9.69m);
-        A(ComponentType.SupportModules, ComponentSize.Large, ChangeType.New, 26.88m);
-        A(ComponentType.SupportModules, ComponentSize.Large, ChangeType.Change, 21.56m);
-        A(ComponentType.DBManipulation, ComponentSize.Small, ChangeType.New, 5.94m);
-        A(ComponentType.DBManipulation, ComponentSize.Small, ChangeType.Change, 4.69m);
+        A(ComponentType.SupportModules, ComponentSize.Small, ChangeType.Change, 4.0625m);
+        A(ComponentType.SupportModules, ComponentSize.Medium, ChangeType.New, 11.875m);
+        A(ComponentType.SupportModules, ComponentSize.Medium, ChangeType.Change, 9.6875m);
+        A(ComponentType.SupportModules, ComponentSize.Large, ChangeType.New, 26.875m);
+        A(ComponentType.SupportModules, ComponentSize.Large, ChangeType.Change, 21.5625m);
+        A(ComponentType.DBManipulation, ComponentSize.Small, ChangeType.New, 5.9375m);
+        A(ComponentType.DBManipulation, ComponentSize.Small, ChangeType.Change, 4.6875m);
         A(ComponentType.DBManipulation, ComponentSize.Medium, ChangeType.New, 15.00m);
-        A(ComponentType.DBManipulation, ComponentSize.Medium, ChangeType.Change, 11.88m);
-        A(ComponentType.DBManipulation, ComponentSize.Large, ChangeType.New, 31.88m);
-        A(ComponentType.DBManipulation, ComponentSize.Large, ChangeType.Change, 25.63m);
-        A(ComponentType.DatabaseReview, ComponentSize.Small, ChangeType.New, 8.13m);
+        A(ComponentType.DBManipulation, ComponentSize.Medium, ChangeType.Change, 11.875m);
+        A(ComponentType.DBManipulation, ComponentSize.Large, ChangeType.New, 31.875m);
+        A(ComponentType.DBManipulation, ComponentSize.Large, ChangeType.Change, 25.625m);
+        A(ComponentType.DatabaseReview, ComponentSize.Small, ChangeType.New, 8.125m);
         A(ComponentType.DatabaseReview, ComponentSize.Small, ChangeType.Change, 6.10m);
-        A(ComponentType.DatabaseReview, ComponentSize.Medium, ChangeType.New, 8.13m);
+        A(ComponentType.DatabaseReview, ComponentSize.Medium, ChangeType.New, 8.125m);
         A(ComponentType.DatabaseReview, ComponentSize.Medium, ChangeType.Change, 6.10m);
-        A(ComponentType.DatabaseReview, ComponentSize.Large, ChangeType.New, 8.13m);
+        A(ComponentType.DatabaseReview, ComponentSize.Large, ChangeType.New, 8.125m);
         A(ComponentType.DatabaseReview, ComponentSize.Large, ChangeType.Change, 6.10m);
         A(ComponentType.Webpage, ComponentSize.Small, ChangeType.New, 20.00m);
         A(ComponentType.Webpage, ComponentSize.Small, ChangeType.Change, 16.00m);

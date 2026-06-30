@@ -93,11 +93,11 @@ public class ProjectEntity
 
     // === Test Cases for System Testing ===
     public bool UseTestCasesForEstimate { get; set; }
-    public int TestCasesSimple { get; set; }
-    public int TestCasesMedium { get; set; }
-    public int TestCasesComplex { get; set; }
-    public int TestCasesVeryComplex { get; set; }
-    public decimal TestCaseIterations { get; set; } = 1m;
+    public decimal TestCasesSimple { get; set; }
+    public decimal TestCasesMedium { get; set; }
+    public decimal TestCasesComplex { get; set; }
+    public decimal TestCasesVeryComplex { get; set; }
+    public decimal TestCaseIterations { get; set; } = 1;
 
     /// <summary>Oracle: CREATED_DATE DATE</summary>
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;

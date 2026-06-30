@@ -218,19 +218,19 @@ public partial class MainViewModel : ObservableObject
     private bool _useTestCasesForEstimate;
 
     [ObservableProperty]
-    private int _testCasesSimple;
+    private decimal _testCasesSimple;
 
     [ObservableProperty]
-    private int _testCasesMedium;
+    private decimal _testCasesMedium;
 
     [ObservableProperty]
-    private int _testCasesComplex;
+    private decimal _testCasesComplex;
 
     [ObservableProperty]
-    private int _testCasesVeryComplex;
+    private decimal _testCasesVeryComplex;
 
     [ObservableProperty]
-    private decimal _testCaseIterations = 1m;
+    private decimal _testCaseIterations = 1;
 
     // === Role Breakout ===
     [ObservableProperty]
@@ -507,10 +507,10 @@ public partial class MainViewModel : ObservableObject
     partial void OnAutomationTestCollabAdjustedHoursChanged(decimal value) => Recalculate();
     partial void OnConsultantMentorAdjustedHoursChanged(decimal value) => Recalculate();
     partial void OnUseTestCasesForEstimateChanged(bool value) => Recalculate();
-    partial void OnTestCasesSimpleChanged(int value) => Recalculate();
-    partial void OnTestCasesMediumChanged(int value) => Recalculate();
-    partial void OnTestCasesComplexChanged(int value) => Recalculate();
-    partial void OnTestCasesVeryComplexChanged(int value) => Recalculate();
+    partial void OnTestCasesSimpleChanged(decimal value) => Recalculate();
+    partial void OnTestCasesMediumChanged(decimal value) => Recalculate();
+    partial void OnTestCasesComplexChanged(decimal value) => Recalculate();
+    partial void OnTestCasesVeryComplexChanged(decimal value) => Recalculate();
     partial void OnTestCaseIterationsChanged(decimal value) => Recalculate();
     partial void OnTotalActualHoursChanged(decimal value) => Recalculate();
     partial void OnTimeForEstimatesChanged(decimal value) => Recalculate();

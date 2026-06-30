@@ -900,7 +900,7 @@
                                                            ToolTip="Sum of all component hours from the Components tab." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding TotalDevelopmentHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding DevelopmentAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}" 
+                                            <TextBox Grid.Column="2" Text="{Binding DevelopmentAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding DevelopmentTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -921,7 +921,7 @@
                                                            ToolTip="Default: 5% of (Development + System Testing). Some analysis hours are included in Development." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding AnalysisHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding AnalysisAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}" 
+                                            <TextBox Grid.Column="2" Text="{Binding AnalysisAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding AnalysisTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -942,7 +942,7 @@
                                                            ToolTip="Default: 15% of (Development + System Testing). Tech Design is covered under Development." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding BusinessDesignHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding BusinessDesignAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}" 
+                                            <TextBox Grid.Column="2" Text="{Binding BusinessDesignAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding BusinessDesignTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -963,7 +963,7 @@
                                                            ToolTip="Default: 30% of Development. Test Automation effort should be selected under Development as 'Test Automation Suites (UFT)'." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding SystemTestingHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding SystemTestingAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}" 
+                                            <TextBox Grid.Column="2" Text="{Binding SystemTestingAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding SystemTestingTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -984,7 +984,7 @@
                                                            ToolTip="Default: 5% of Development. Includes Dev, Model, E2E, UAT, Prod &amp; Training Environment promotion and System Documentation." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding PromotionHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding PromotionAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}" 
+                                            <TextBox Grid.Column="2" Text="{Binding PromotionAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding PromotionTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1005,7 +1005,7 @@
                                                            ToolTip="Default: 5% of Development. BA System Documentation and Communication Plan." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding BaSystemDocHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding BaSystemDocAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}" 
+                                            <TextBox Grid.Column="2" Text="{Binding BaSystemDocAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding BaSystemDocTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1026,7 +1026,7 @@
                                                            ToolTip="Default: 20% of System Testing. Includes time for documenting System Documentation." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding ProductionValidationHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding ProductionValidationAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}" 
+                                            <TextBox Grid.Column="2" Text="{Binding ProductionValidationAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding ProductionValidationTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1047,7 +1047,7 @@
                                                            ToolTip="Default: PM% of overall effort (Development + all derived tasks). Change the percentage in Project Settings." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding ProjectManagementHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding ProjectManagementAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}" 
+                                            <TextBox Grid.Column="2" Text="{Binding ProjectManagementAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding ProjectManagementTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1068,7 +1068,7 @@
                                                            ToolTip="10 WPRs — BRD (if applicable), Initial Estimate, BDD, Detailed Estimate, TDD, Code, Test Plan, Test Results, System Documentation and Production Validation.&#x0a;&#x0a;To make a Change → Select Number of WPRs, Meeting Duration, Number of Participants and Prep Time per Participant in the Collaboration tab." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding WprsHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding WprsAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Grid.Column="2" Text="{Binding WprsAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}"
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding WprsTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1089,7 +1089,7 @@
                                                            ToolTip="5 meetings with an average of 3 participants, with 15 mins of prep time for each participant yields 18.75 hours.&#x0a;&#x0a;To make a Change → Provide Number of meetings, Meeting Duration, Number of Participants and Prep Time per Participant in the Collaboration tab." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding ClientMeetingsHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding ClientMeetingsAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Grid.Column="2" Text="{Binding ClientMeetingsAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}"
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding ClientMeetingsTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1110,7 +1110,7 @@
                                                            ToolTip="5 meetings with an average of 3 participants, with 15 mins of prep time for each participant yields 18.75 hours.&#x0a;&#x0a;To make a Change → Provide Number of meetings, Meeting Duration, Number of Participants and Prep Time per Participant in the Collaboration tab." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding InternalMeetingsHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding InternalMeetingsAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Grid.Column="2" Text="{Binding InternalMeetingsAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}"
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding InternalMeetingsTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1131,7 +1131,7 @@
                                                            ToolTip="5 meetings with an average of 3 participants, with 15 mins of prep time for each participant yields 18.75 hours.&#x0a;&#x0a;To make a Change → Provide Number of meetings, Meeting Duration, Number of Participants and Prep Time per Participant in the Collaboration tab." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding AutomationTestCollabHours, StringFormat=N2}" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding AutomationTestCollabAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Grid.Column="2" Text="{Binding AutomationTestCollabAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}"
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding AutomationTestCollabTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1152,7 +1152,7 @@
                                                            ToolTip="Insert hours for Consultant and Mentors." />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="0.00" FontSize="12" Foreground="#6B7280" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <TextBox Grid.Column="2" Text="{Binding ConsultantMentorAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Grid.Column="2" Text="{Binding ConsultantMentorAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}"
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding ConsultantMentorTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
                                         </Grid>
@@ -1210,15 +1210,15 @@
                                         <TextBlock Grid.Row="0" Grid.Column="3" Text="Very Complex (4h)" Style="{StaticResource FieldLabel}" Margin="8,0,0,0" />
                                         <TextBlock Grid.Row="0" Grid.Column="4" Text="Iterations" Style="{StaticResource FieldLabel}" Margin="8,0,0,0" />
 
-                                        <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding TestCasesSimple, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
+                                        <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding TestCasesSimple, UpdateSourceTrigger=LostFocus, StringFormat={}{0:0.##}, ValidatesOnExceptions=True}" 
                                                  Style="{StaticResource NumericTextBox}" Margin="0,4,4,0" />
-                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding TestCasesMedium, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
+                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding TestCasesMedium, UpdateSourceTrigger=LostFocus, StringFormat={}{0:0.##}, ValidatesOnExceptions=True}" 
                                                  Style="{StaticResource NumericTextBox}" Margin="8,4,4,0" />
-                                        <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding TestCasesComplex, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
+                                        <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding TestCasesComplex, UpdateSourceTrigger=LostFocus, StringFormat={}{0:0.##}, ValidatesOnExceptions=True}" 
                                                  Style="{StaticResource NumericTextBox}" Margin="8,4,4,0" />
-                                        <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding TestCasesVeryComplex, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
+                                        <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding TestCasesVeryComplex, UpdateSourceTrigger=LostFocus, StringFormat={}{0:0.##}, ValidatesOnExceptions=True}" 
                                                  Style="{StaticResource NumericTextBox}" Margin="8,4,4,0" />
-                                        <TextBox Grid.Row="1" Grid.Column="4" Text="{Binding TestCaseIterations, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
+                                        <TextBox Grid.Row="1" Grid.Column="4" Text="{Binding TestCaseIterations, UpdateSourceTrigger=LostFocus, StringFormat={}{0:0.##}, ValidatesOnExceptions=True}" 
                                                  Style="{StaticResource NumericTextBox}" Margin="8,4,0,0" />
                                     </Grid>
                                 </StackPanel>
@@ -1242,7 +1242,7 @@
 
                                         <StackPanel Grid.Column="0" Margin="0,0,12,0">
                                             <TextBlock Text="Total Actual Hours (incl. Initial Estimate)" Style="{StaticResource FieldLabel}" />
-                                            <TextBox Text="{Binding TotalActualHours, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
+                                            <TextBox Text="{Binding TotalActualHours, UpdateSourceTrigger=LostFocus, StringFormat={}{0:0.##}, ValidatesOnExceptions=True}" 
                                                      Style="{StaticResource NumericTextBox}" />
                                         </StackPanel>
 
@@ -1254,7 +1254,7 @@
 
                                         <StackPanel Grid.Column="2">
                                             <TextBlock Text="Time for Estimates (Detailed &amp; Final)" Style="{StaticResource FieldLabel}" />
-                                            <TextBox Text="{Binding TimeForEstimates, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" 
+                                            <TextBox Text="{Binding TimeForEstimates, UpdateSourceTrigger=LostFocus, StringFormat={}{0:0.##}, ValidatesOnExceptions=True}" 
                                                      Style="{StaticResource NumericTextBox}" />
                                         </StackPanel>
                                     </Grid>
