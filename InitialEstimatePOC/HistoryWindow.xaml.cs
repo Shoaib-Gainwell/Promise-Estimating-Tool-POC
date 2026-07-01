@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.EntityFrameworkCore;
 using InitialEstimatePOC.Data;
@@ -11,6 +14,8 @@ public partial class HistoryWindow : Window
 {
     public ProjectEntity? SelectedProject { get; private set; }
 
+    private List<ProjectEntity> _allProjects = new();
+
     public HistoryWindow()
     {
         InitializeComponent();
@@ -19,8 +24,38 @@ public partial class HistoryWindow : Window
 
     private void LoadProjects()
     {
-        var projects = MainViewModel.GetAllProjects();
-        ProjectsGrid.ItemsSource = projects;
+        _allProjects = MainViewModel.GetAllProjects();
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        var term = SearchBox?.Text?.Trim() ?? string.Empty;
+        if (string.IsNullOrEmpty(term))
+        {
+            ProjectsGrid.ItemsSource = _allProjects;
+        }
+        else
+        {
+            ProjectsGrid.ItemsSource = _allProjects
+                .Where(p => (p.ProjectName ?? string.Empty)
+                    .Contains(term, System.StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+    }
+
+    private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+    {
+        ClearSearchButton.Visibility = string.IsNullOrEmpty(SearchBox.Text)
+            ? System.Windows.Visibility.Collapsed
+            : System.Windows.Visibility.Visible;
+        ApplyFilter();
+    }
+
+    private void OnClearSearchClick(object sender, RoutedEventArgs e)
+    {
+        SearchBox.Clear();
+        SearchBox.Focus();
     }
 
     private void OnProjectDoubleClick(object sender, MouseButtonEventArgs e)

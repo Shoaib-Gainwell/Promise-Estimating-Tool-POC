@@ -404,14 +404,31 @@
 
         <!-- ═══════════ MAIN CONTENT: Tabs (Components + Collaboration + Assumptions) + Sidebar ═══════════ -->
         <Grid Grid.Row="2" Margin="0,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition x:Name="SidebarColumn" Width="330" />
             </Grid.ColumnDefinitions>
 
+            <!-- Global toolbar above all tabs -->
+            <StackPanel Grid.Row="0" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="8,8,8,4">
+                <Button Content="📋 History" Style="{StaticResource GhostButton}" 
+                        Click="OnHistoryClick" Margin="0,0,8,0"
+                        ToolTip="Browse and load previously saved estimates" />
+                <Button Content="Clear All" Style="{StaticResource GhostButton}" 
+                        Click="OnClearAllClick" Margin="0,0,8,0"
+                        ToolTip="Remove all components and collaboration items" />
+                <Button Content="⚙ Settings" Style="{StaticResource GhostButton}" 
+                        Click="OnSettingsClick"
+                        ToolTip="Edit weighted values (base hours per component type)" />
+            </StackPanel>
+
             <!-- LEFT: Tabbed Content Area -->
-            <TabControl x:Name="MainTabControl" Grid.Column="0" Margin="8" BorderThickness="0" Background="Transparent">
+            <TabControl x:Name="MainTabControl" Grid.Row="1" Grid.Column="0" Margin="8,4,8,8" BorderThickness="0" Background="Transparent">
                 <TabControl.Resources>
                     <Style TargetType="TabItem">
                         <Setter Property="Padding" Value="12,6" />
@@ -434,15 +451,6 @@
                                 <Button Content="💾 Save" Style="{StaticResource PrimaryButton}" 
                                         Click="OnSaveClick" Margin="0,0,8,0"
                                         ToolTip="Save this estimate (Ctrl+S)" />
-                                <Button Content="📋 History" Style="{StaticResource GhostButton}" 
-                                        Click="OnHistoryClick" Margin="0,0,8,0"
-                                        ToolTip="Browse and load previously saved estimates" />
-                                <Button Content="Clear All" Style="{StaticResource GhostButton}" 
-                                        Click="OnClearAllClick" Margin="0,0,8,0"
-                                        ToolTip="Remove all components and collaboration items" />
-                                <Button Content="⚙ Settings" Style="{StaticResource GhostButton}" 
-                                        Click="OnSettingsClick" Margin="0,0,8,0"
-                                        ToolTip="Edit weighted values (base hours per component type)" />
                                 <Button Content="↶ Undo" Style="{StaticResource GhostButton}" 
                                         Click="OnUndoClick"
                                         ToolTip="Undo last delete (Ctrl+Z)" />
@@ -1282,7 +1290,7 @@
             </TabControl>
 
             <!-- ═══════════ SIDEBAR TOGGLE ═══════════ -->
-            <Button x:Name="SidebarToggleButton" Grid.Column="1" 
+            <Button x:Name="SidebarToggleButton" Grid.Row="1" Grid.Column="1" 
                     Click="OnToggleSidebar" VerticalAlignment="Top" Margin="0,16,0,0"
                     Width="24" Height="48" Cursor="Hand"
                     ToolTip="Hide sidebar (summary panel)"
@@ -1298,7 +1306,7 @@
             </Button>
 
             <!-- ═══════════ RIGHT SIDEBAR ═══════════ -->
-            <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer Grid.Row="1" Grid.Column="2" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
                     <!-- Derived Tasks Card -->
                     <Border Style="{StaticResource CardBorder}">
