@@ -6,6 +6,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -21,8 +22,49 @@
             <TextBlock Text="📋 Project History" FontSize="18" FontWeight="SemiBold" Foreground="White" />
         </Border>
 
+        <!-- Search bar -->
+        <Border Grid.Row="1" Margin="16,12,16,0" Padding="8,6"
+                BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="6" Background="White">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="🔍" FontSize="13" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <TextBox x:Name="SearchBox" Grid.Column="1"
+                         BorderThickness="0" Padding="0,2" FontSize="13" VerticalAlignment="Center"
+                         TextChanged="OnSearchTextChanged"
+                         ToolTip="Filter by project name (e.g. type 'power' to find all projects containing 'power')">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox">
+                            <Style.Resources>
+                                <VisualBrush x:Key="PlaceholderBrush" Stretch="None" AlignmentX="Left">
+                                    <VisualBrush.Visual>
+                                        <TextBlock Text="Search by project name…" Foreground="#9CA3AF" FontSize="13" />
+                                    </VisualBrush.Visual>
+                                </VisualBrush>
+                            </Style.Resources>
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="">
+                                    <Setter Property="Background" Value="{StaticResource PlaceholderBrush}" />
+                                </Trigger>
+                                <Trigger Property="Text" Value="{x:Null}">
+                                    <Setter Property="Background" Value="{StaticResource PlaceholderBrush}" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+                <Button x:Name="ClearSearchButton" Grid.Column="2" Content="✕"
+                        FontSize="11" Foreground="#9CA3AF" Background="Transparent" BorderThickness="0"
+                        Cursor="Hand" Visibility="Collapsed" Padding="4,0"
+                        Click="OnClearSearchClick" ToolTip="Clear search" />
+            </Grid>
+        </Border>
+
         <!-- DataGrid of projects -->
-        <DataGrid x:Name="ProjectsGrid" Grid.Row="1" Margin="16"
+        <DataGrid x:Name="ProjectsGrid" Grid.Row="2" Margin="16,8,16,4"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   CanUserAddRows="False"
@@ -73,7 +115,7 @@
         </DataGrid>
 
         <!-- Footer buttons -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="16,0,16,12">
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="16,0,16,12">
             <Button Content="Load Selected" Padding="16,8" FontSize="13" FontWeight="SemiBold"
                     Background="#00857C" Foreground="White" BorderThickness="0" Cursor="Hand"
                     Click="OnLoadClick" Margin="0,0,8,0">

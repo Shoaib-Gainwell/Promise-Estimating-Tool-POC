@@ -230,7 +230,7 @@ public partial class MainViewModel : ObservableObject
     private decimal _testCasesVeryComplex;
 
     [ObservableProperty]
-    private decimal _testCaseIterations = 1;
+    private decimal _testCaseIterations = 0;
 
     // === Role Breakout ===
     [ObservableProperty]
