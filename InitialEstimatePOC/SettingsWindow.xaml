@@ -106,7 +106,7 @@
                     <DataGridTextColumn Header="Base Hours" Binding="{Binding BaseHours, StringFormat=N2, UpdateSourceTrigger=PropertyChanged}" Width="100" 
                                         FontWeight="SemiBold" />
                     <DataGridTextColumn Header="Modified By" Binding="{Binding ModifiedBy}" Width="100" IsReadOnly="True" />
-                    <DataGridTextColumn Header="Last Modified" Binding="{Binding LastModified, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Width="140" IsReadOnly="True" />
+                    <DataGridTextColumn Header="Last Modified" Binding="{Binding LastModified, StringFormat='{}{0:MM/dd/yyyy h:mm tt}'}" Width="155" IsReadOnly="True" />
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
