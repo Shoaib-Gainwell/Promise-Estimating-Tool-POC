@@ -49,7 +49,7 @@ public class AdjustedHoursConverter : IValueConverter
     {
         if (value is decimal d && d != 0m)
             return d.ToString("0.##");
-        return string.Empty;
+        return "0";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

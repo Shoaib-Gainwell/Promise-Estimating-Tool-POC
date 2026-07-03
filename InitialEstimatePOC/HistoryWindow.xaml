@@ -35,13 +35,13 @@
                 <TextBox x:Name="SearchBox" Grid.Column="1"
                          BorderThickness="0" Padding="0,2" FontSize="13" VerticalAlignment="Center"
                          TextChanged="OnSearchTextChanged"
-                         ToolTip="Filter by project name (e.g. type 'power' to find all projects containing 'power')">
+                         ToolTip="Filter by Project Name or Change Order (e.g. type 'power' or 'CO-123')">
                     <TextBox.Style>
                         <Style TargetType="TextBox">
                             <Style.Resources>
                                 <VisualBrush x:Key="PlaceholderBrush" Stretch="None" AlignmentX="Left">
                                     <VisualBrush.Visual>
-                                        <TextBlock Text="Search by project name…" Foreground="#9CA3AF" FontSize="13" />
+                                        <TextBlock Text="Search by project name or change order…" Foreground="#9CA3AF" FontSize="13" />
                                     </VisualBrush.Visual>
                                 </VisualBrush>
                             </Style.Resources>
@@ -109,8 +109,8 @@
                 <DataGridTextColumn Header="Total Hours" Binding="{Binding GrandTotalHours, StringFormat=N2}" Width="90" />
                 <DataGridTextColumn Header="T-Shirt" Binding="{Binding TShirtSize}" Width="70" />
                 <DataGridTextColumn Header="Components" Binding="{Binding Components.Count}" Width="90" />
-                <DataGridTextColumn Header="Created" Binding="{Binding CreatedDate, StringFormat=yyyy-MM-dd}" Width="90" />
-                <DataGridTextColumn Header="Modified" Binding="{Binding LastModifiedDate, StringFormat=yyyy-MM-dd HH:mm}" Width="130" />
+                <DataGridTextColumn Header="Created" Binding="{Binding CreatedDate, StringFormat=MM/dd/yyyy}" Width="90" />
+                <DataGridTextColumn Header="Modified" Binding="{Binding LastModifiedDate, StringFormat='MM/dd/yyyy h:mm tt'}" Width="140" />
             </DataGrid.Columns>
         </DataGrid>
 

@@ -68,6 +68,21 @@ public class ProjectEntity
     public decimal ProductionValidationAdjustedHours { get; set; }
     public decimal ProjectManagementAdjustedHours { get; set; }
 
+    // === Adjustment Row Notes ===
+    public string DevelopmentNotes { get; set; } = string.Empty;
+    public string AnalysisNotes { get; set; } = string.Empty;
+    public string BusinessDesignNotes { get; set; } = string.Empty;
+    public string SystemTestingNotes { get; set; } = string.Empty;
+    public string PromotionNotes { get; set; } = string.Empty;
+    public string BaSystemDocNotes { get; set; } = string.Empty;
+    public string ProductionValidationNotes { get; set; } = string.Empty;
+    public string ProjectManagementNotes { get; set; } = string.Empty;
+    public string WprsNotes { get; set; } = string.Empty;
+    public string ClientMeetingsNotes { get; set; } = string.Empty;
+    public string InternalMeetingsNotes { get; set; } = string.Empty;
+    public string AutomationTestCollabNotes { get; set; } = string.Empty;
+    public string ConsultantMentorNotes { get; set; } = string.Empty;
+
     // === Assumptions ===
     /// <summary>Oracle: SE_ASSUMPTIONS VARCHAR2(2000)</summary>
     public string SeAssumptions { get; set; } = string.Empty;

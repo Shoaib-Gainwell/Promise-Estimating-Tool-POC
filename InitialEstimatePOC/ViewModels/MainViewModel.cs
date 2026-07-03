@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Data.Sqlite;
@@ -108,6 +109,46 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private decimal _collaborationAdjustedHours;
+
+    // === Adjustment Row Notes ===
+    [ObservableProperty]
+    private string _developmentNotes = string.Empty;
+
+    [ObservableProperty]
+    private string _analysisNotes = string.Empty;
+
+    [ObservableProperty]
+    private string _businessDesignNotes = string.Empty;
+
+    [ObservableProperty]
+    private string _systemTestingNotes = string.Empty;
+
+    [ObservableProperty]
+    private string _promotionNotes = string.Empty;
+
+    [ObservableProperty]
+    private string _baSystemDocNotes = string.Empty;
+
+    [ObservableProperty]
+    private string _productionValidationNotes = string.Empty;
+
+    [ObservableProperty]
+    private string _projectManagementNotes = string.Empty;
+
+    [ObservableProperty]
+    private string _wprsNotes = string.Empty;
+
+    [ObservableProperty]
+    private string _clientMeetingsNotes = string.Empty;
+
+    [ObservableProperty]
+    private string _internalMeetingsNotes = string.Empty;
+
+    [ObservableProperty]
+    private string _automationTestCollabNotes = string.Empty;
+
+    [ObservableProperty]
+    private string _consultantMentorNotes = string.Empty;
 
     // Per-task totals (Calculated + Adjusted)
     [ObservableProperty]
@@ -432,6 +473,7 @@ public partial class MainViewModel : ObservableObject
 
         // Reset actual hours
         TotalActualHours = 0m;
+        ActualHoursAsOfDate = null;
         TimeForEstimates = 0m;
 
         _suppressRecalculate = false;
@@ -742,6 +784,19 @@ public partial class MainViewModel : ObservableObject
             existing.CollaborationAssumptions = CollaborationAssumptions;
             existing.GeneralAssumptions = GeneralAssumptions;
             existing.AdjustedHoursComments = AdjustedHoursComments;
+            existing.DevelopmentNotes = DevelopmentNotes;
+            existing.AnalysisNotes = AnalysisNotes;
+            existing.BusinessDesignNotes = BusinessDesignNotes;
+            existing.SystemTestingNotes = SystemTestingNotes;
+            existing.PromotionNotes = PromotionNotes;
+            existing.BaSystemDocNotes = BaSystemDocNotes;
+            existing.ProductionValidationNotes = ProductionValidationNotes;
+            existing.ProjectManagementNotes = ProjectManagementNotes;
+            existing.WprsNotes = WprsNotes;
+            existing.ClientMeetingsNotes = ClientMeetingsNotes;
+            existing.InternalMeetingsNotes = InternalMeetingsNotes;
+            existing.AutomationTestCollabNotes = AutomationTestCollabNotes;
+            existing.ConsultantMentorNotes = ConsultantMentorNotes;
             existing.TotalActualHours = TotalActualHours;
             existing.ActualHoursAsOfDate = ActualHoursAsOfDate;
             existing.TimeForEstimates = TimeForEstimates;
@@ -797,6 +852,19 @@ public partial class MainViewModel : ObservableObject
                 CollaborationAssumptions = CollaborationAssumptions,
                 GeneralAssumptions = GeneralAssumptions,
                 AdjustedHoursComments = AdjustedHoursComments,
+                DevelopmentNotes = DevelopmentNotes,
+                AnalysisNotes = AnalysisNotes,
+                BusinessDesignNotes = BusinessDesignNotes,
+                SystemTestingNotes = SystemTestingNotes,
+                PromotionNotes = PromotionNotes,
+                BaSystemDocNotes = BaSystemDocNotes,
+                ProductionValidationNotes = ProductionValidationNotes,
+                ProjectManagementNotes = ProjectManagementNotes,
+                WprsNotes = WprsNotes,
+                ClientMeetingsNotes = ClientMeetingsNotes,
+                InternalMeetingsNotes = InternalMeetingsNotes,
+                AutomationTestCollabNotes = AutomationTestCollabNotes,
+                ConsultantMentorNotes = ConsultantMentorNotes,
                 TotalActualHours = TotalActualHours,
                 ActualHoursAsOfDate = ActualHoursAsOfDate,
                 TimeForEstimates = TimeForEstimates,
@@ -899,6 +967,19 @@ public partial class MainViewModel : ObservableObject
         CollaborationAssumptions = project.CollaborationAssumptions;
         GeneralAssumptions = project.GeneralAssumptions;
         AdjustedHoursComments = project.AdjustedHoursComments;
+        DevelopmentNotes = project.DevelopmentNotes;
+        AnalysisNotes = project.AnalysisNotes;
+        BusinessDesignNotes = project.BusinessDesignNotes;
+        SystemTestingNotes = project.SystemTestingNotes;
+        PromotionNotes = project.PromotionNotes;
+        BaSystemDocNotes = project.BaSystemDocNotes;
+        ProductionValidationNotes = project.ProductionValidationNotes;
+        ProjectManagementNotes = project.ProjectManagementNotes;
+        WprsNotes = project.WprsNotes;
+        ClientMeetingsNotes = project.ClientMeetingsNotes;
+        InternalMeetingsNotes = project.InternalMeetingsNotes;
+        AutomationTestCollabNotes = project.AutomationTestCollabNotes;
+        ConsultantMentorNotes = project.ConsultantMentorNotes;
         TotalActualHours = project.TotalActualHours;
         ActualHoursAsOfDate = project.ActualHoursAsOfDate;
         TimeForEstimates = project.TimeForEstimates;
@@ -1021,7 +1102,7 @@ public partial class ComponentRowViewModel : ObservableObject
 /// Matches Excel formula: NumMeetings × (MeetingDuration/60 + PrepTime/60) × NumParticipants
 /// Excel columns: J=Number of Meetings/WPRs, K=Meeting Duration (In Mins), L=Number of Participants, M=Participant Prep Time (In Mins)
 /// </summary>
-public partial class CollaborationRowViewModel : ObservableObject
+public partial class CollaborationRowViewModel : ObservableValidator
 {
     [ObservableProperty]
     private int _lineNumber;
@@ -1034,22 +1115,41 @@ public partial class CollaborationRowViewModel : ObservableObject
 
     /// <summary>Column J: Number of Meetings / WPRs</summary>
     [ObservableProperty]
+    [Range(0, 20, ErrorMessage = "Number of Meetings must be between 0 and 20.")]
     private int _numberOfMeetings = 1;
 
     /// <summary>Column K: Meeting Duration (In Mins)</summary>
     [ObservableProperty]
+    [CustomValidation(typeof(CollaborationRowViewModel), nameof(ValidateMeetingDuration))]
     private int _meetingDurationMinutes = 60;
 
     /// <summary>Column L: Number of Participants</summary>
     [ObservableProperty]
+    [Range(0, 20, ErrorMessage = "Number of Participants must be between 0 and 20.")]
     private int _numberOfParticipants = 3;
 
     /// <summary>Column M: Participant Prep Time (In Mins)</summary>
     [ObservableProperty]
+    [CustomValidation(typeof(CollaborationRowViewModel), nameof(ValidatePrepTime))]
     private int _participantPrepTimeMinutes = 15;
 
     [ObservableProperty]
     private string _notes = string.Empty;
+
+    public static ValidationResult? ValidateMeetingDuration(int value, ValidationContext context)
+    {
+        int[] valid = { 0, 15, 30, 45, 60 };
+        return valid.Contains(value)
+            ? ValidationResult.Success
+            : new ValidationResult("Meeting Duration must be 0, 15, 30, 45, or 60 minutes.");
+    }
+
+    public static ValidationResult? ValidatePrepTime(int value, ValidationContext context)
+    {
+        return value >= 0 && value <= 180 && value % 15 == 0
+            ? ValidationResult.Success
+            : new ValidationResult("Prep Time must be a multiple of 15 between 0 and 180.");
+    }
 
     /// <summary>
     /// Excel formula: ROUNDUP((Meetings × Participants × Duration/60) + (Meetings × Participants × PrepTime/60), 2)

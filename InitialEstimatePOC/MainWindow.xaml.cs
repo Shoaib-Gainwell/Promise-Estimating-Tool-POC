@@ -552,9 +552,156 @@ public partial class MainWindow : Window
         SingleClickEdit(ComponentsGrid, e);
     }
 
+    private void CollaborationGrid_PreparingCellForEdit(object sender, DataGridPreparingCellForEditEventArgs e)
+    {
+        var combo = FindVisualChild<ComboBox>(e.EditingElement);
+        if (combo == null) return;
+
+        // When Tab is pressed while the dropdown is open, close the dropdown and let Tab commit+move
+        // When Enter is pressed, treat it like Tab — commit the cell and move to the next editable column
+        combo.PreviewKeyDown += (s, args) =>
+        {
+            if (args.Key == Key.Tab && combo.IsDropDownOpen)
+            {
+                combo.IsDropDownOpen = false;
+                // Do not mark Handled — let Tab propagate to DataGrid for normal navigation
+            }
+            else if (args.Key == Key.Enter)
+            {
+                if (combo.IsDropDownOpen)
+                    combo.IsDropDownOpen = false;
+
+                // Prevent the DataGrid's default Enter behavior (move to next row)
+                args.Handled = true;
+
+                // Capture current cell info before committing
+                var currentCell = CollaborationGrid.CurrentCell;
+
+                Dispatcher.BeginInvoke(DispatcherPriority.Input, () =>
+                {
+                    CollaborationGrid.CommitEdit(DataGridEditingUnit.Cell, exitEditingMode: true);
+
+                    if (!currentCell.IsValid) return;
+
+                    // Find the next editable column after the current one
+                    int currentColIdx = CollaborationGrid.Columns.IndexOf(currentCell.Column);
+                    for (int i = currentColIdx + 1; i < CollaborationGrid.Columns.Count; i++)
+                    {
+                        if (!CollaborationGrid.Columns[i].IsReadOnly)
+                        {
+                            CollaborationGrid.CurrentCell = new DataGridCellInfo(currentCell.Item, CollaborationGrid.Columns[i]);
+                            CollaborationGrid.BeginEdit();
+                            break;
+                        }
+                    }
+                });
+            }
+        };
+    }
+
     private void CollaborationGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         SingleClickEdit(CollaborationGrid, e);
+    }
+
+    private void CollaborationGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+    {
+        if (e.EditAction != DataGridEditAction.Commit) return;
+        if (e.Row.Item is not InitialEstimatePOC.ViewModels.CollaborationRowViewModel row) return;
+
+        // Find the editing ComboBox inside the cell
+        var combo = FindVisualChild<ComboBox>(e.EditingElement);
+        if (combo == null) return;
+
+        var text = combo.Text?.Trim() ?? string.Empty;
+        if (!int.TryParse(text, out int entered)) { e.Cancel = true; return; }
+
+        string colHeader = (e.Column.Header as string) ?? string.Empty;
+
+        bool valid = colHeader switch
+        {
+            var h when h.StartsWith("Number of Meetings") => entered >= 0 && entered <= 20,
+            var h when h.StartsWith("Meeting Duration")   => new[] { 0, 15, 30, 45, 60 }.Contains(entered),
+            var h when h.StartsWith("Number of Participants") => entered >= 0 && entered <= 20,
+            var h when h.StartsWith("Participant Prep")   => entered >= 0 && entered <= 180 && entered % 15 == 0,
+            _ => true
+        };
+
+        if (!valid)
+        {
+            e.Cancel = true;
+            var cell = e.Column.GetCellContent(e.Row)?.Parent as DataGridCell;
+            MessageBox.Show(
+                colHeader switch
+                {
+                    var h when h.StartsWith("Meeting Duration") =>
+                        "Invalid value. Meeting Duration must be one of: 0, 15, 30, 45, or 60 minutes.",
+                    var h when h.StartsWith("Participant Prep") =>
+                        "Invalid value. Prep Time must be a multiple of 15 between 0 and 180 minutes.",
+                    var h when h.StartsWith("Number of Meetings") =>
+                        "Invalid value. Number of Meetings must be between 0 and 20.",
+                    _ =>
+                        "Invalid value. Number of Participants must be between 0 and 20."
+                },
+                "Invalid Input", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+            // Delay focus so DataGrid's own post-handler navigation is overridden
+            Dispatcher.BeginInvoke(DispatcherPriority.Input, () =>
+            {
+                CollaborationGrid.CurrentCell = new DataGridCellInfo(e.Row.Item, e.Column);
+                CollaborationGrid.BeginEdit();
+                var editingCombo = FindVisualChild<ComboBox>(e.Column.GetCellContent(e.Row)?.Parent as DependencyObject);
+                editingCombo?.Focus();
+            });
+        }
+    }
+
+    // ─── PM Effort ComboBox validation ───────────────────────────────────────
+
+    private void PmEffortComboBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        ValidatePmEffortComboBox();
+    }
+
+    private void PmEffortComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            // Move focus away — this triggers LostFocus which runs the validation
+            e.Handled = true;
+            MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+        }
+    }
+
+    private void ValidatePmEffortComboBox()
+    {
+        if (DataContext is not MainViewModel vm) return;
+
+        var text = PmEffortComboBox.Text?.Trim() ?? string.Empty;
+        bool valid = int.TryParse(text, out int entered) && vm.PmEffortOptions.Contains((decimal)entered);
+
+        if (!valid)
+        {
+            MessageBox.Show(
+                $"Invalid value '{text}'. PM Effort must be a whole number between {(int)vm.PmEffortOptions.First()} and {(int)vm.PmEffortOptions.Last()}%.",
+                "Invalid PM Effort", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+            // Revert to the current valid ViewModel value (keeps VM and UI in sync)
+            PmEffortComboBox.Text = vm.PmEffortPercentage.ToString();
+        }
+    }
+
+    private static T? FindVisualChild<T>(DependencyObject? parent) where T : DependencyObject
+    {
+        if (parent == null) return null;
+        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+        {
+            var child = VisualTreeHelper.GetChild(parent, i);
+            if (child is T match) return match;
+            var result = FindVisualChild<T>(child);
+            if (result != null) return result;
+        }
+        return null;
     }
 
     private void SingleClickEdit(DataGrid grid, MouseButtonEventArgs e)

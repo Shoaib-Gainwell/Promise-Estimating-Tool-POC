@@ -38,8 +38,9 @@ public partial class HistoryWindow : Window
         else
         {
             ProjectsGrid.ItemsSource = _allProjects
-                .Where(p => (p.ProjectName ?? string.Empty)
-                    .Contains(term, System.StringComparison.OrdinalIgnoreCase))
+                .Where(p =>
+                    (p.ProjectName ?? string.Empty).Contains(term, System.StringComparison.OrdinalIgnoreCase) ||
+                    (p.ChangeOrderId ?? string.Empty).Contains(term, System.StringComparison.OrdinalIgnoreCase))
                 .ToList();
         }
     }
