@@ -96,7 +96,7 @@ public class ConverterTests
     {
         var converter = new AdjustedHoursConverter();
         var result = converter.Convert(0m, typeof(string), null!, CultureInfo.InvariantCulture);
-        Assert.Equal(string.Empty, result);
+        Assert.Equal("0", result);
     }
 
     [Fact]
@@ -136,7 +136,7 @@ public class ConverterTests
     {
         var converter = new AdjustedHoursConverter();
         var result = converter.Convert("not a decimal", typeof(string), null!, CultureInfo.InvariantCulture);
-        Assert.Equal(string.Empty, result);
+        Assert.Equal("0", result);
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public class ConverterTests
     {
         var converter = new AdjustedHoursConverter();
         var result = converter.Convert(null!, typeof(string), null!, CultureInfo.InvariantCulture);
-        Assert.Equal(string.Empty, result);
+        Assert.Equal("0", result);
     }
 
     #endregion
