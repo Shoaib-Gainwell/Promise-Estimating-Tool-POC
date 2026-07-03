@@ -34,6 +34,8 @@
         <conv:AdjustedHoursConverter x:Key="AdjustedHours" />
         <conv:ZeroToVisibilityConverter x:Key="ZeroToVisibility" />
         <conv:EnumDisplayConverter x:Key="EnumDisplay" />
+        <conv:NotesCharCountConverter x:Key="NotesCharCount" />
+        <conv:NotesCharCountColorConverter x:Key="NotesCharCountColor" />
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
 
         <!-- Card Style -->
@@ -669,24 +671,29 @@
                                         </DataGridTextColumn.HeaderStyle>
                                     </DataGridTextColumn>
 
-                                    <DataGridTextColumn Header="Notes" Binding="{Binding Notes, UpdateSourceTrigger=PropertyChanged}" Width="120">
-                                        <DataGridTextColumn.HeaderStyle>
+                                    <DataGridTemplateColumn Header="Notes" Width="120">
+                                        <DataGridTemplateColumn.HeaderStyle>
                                             <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                                                 <Setter Property="ToolTip" Value="Optional notes/assumptions for this specific component. Useful for audit trail and reviewer context." />
                                             </Style>
-                                        </DataGridTextColumn.HeaderStyle>
-                                        <DataGridTextColumn.EditingElementStyle>
-                                            <Style TargetType="TextBox">
-                                                <Setter Property="MaxLength" Value="1000" />
-                                                <Setter Property="ToolTip" Value="Max 1,000 characters" />
-                                            </Style>
-                                        </DataGridTextColumn.EditingElementStyle>
-                                        <DataGridTextColumn.ElementStyle>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="ToolTip" Value="{Binding Notes}" />
-                                            </Style>
-                                        </DataGridTextColumn.ElementStyle>
-                                    </DataGridTextColumn>
+                                        </DataGridTemplateColumn.HeaderStyle>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Notes}" VerticalAlignment="Center" Padding="4,0" TextTrimming="CharacterEllipsis" ToolTip="{Binding Notes}" Foreground="{Binding Notes, Converter={StaticResource NotesCharCountColor}}" />
+                                                    <TextBlock Text="{Binding Notes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding Notes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}" MaxLength="1000" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" ToolTip="{Binding Notes}" Foreground="{Binding Notes, Converter={StaticResource NotesCharCountColor}}" />
+                                                    <TextBlock Text="{Binding Notes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding Notes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
 
                                     <DataGridTemplateColumn Header="" Width="35">
                                         <DataGridTemplateColumn.CellTemplate>
@@ -895,24 +902,29 @@
                                         </DataGridTextColumn.HeaderStyle>
                                     </DataGridTextColumn>
 
-                                    <DataGridTextColumn Header="Notes" Binding="{Binding Notes, UpdateSourceTrigger=PropertyChanged}" Width="120">
-                                        <DataGridTextColumn.HeaderStyle>
+                                    <DataGridTemplateColumn Header="Notes" Width="120">
+                                        <DataGridTemplateColumn.HeaderStyle>
                                             <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                                                 <Setter Property="ToolTip" Value="Optional notes for this collaboration row (max 1,000 characters)." />
                                             </Style>
-                                        </DataGridTextColumn.HeaderStyle>
-                                        <DataGridTextColumn.EditingElementStyle>
-                                            <Style TargetType="TextBox">
-                                                <Setter Property="MaxLength" Value="1000" />
-                                                <Setter Property="ToolTip" Value="Max 1,000 characters" />
-                                            </Style>
-                                        </DataGridTextColumn.EditingElementStyle>
-                                        <DataGridTextColumn.ElementStyle>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="ToolTip" Value="{Binding Notes}" />
-                                            </Style>
-                                        </DataGridTextColumn.ElementStyle>
-                                    </DataGridTextColumn>
+                                        </DataGridTemplateColumn.HeaderStyle>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Notes}" VerticalAlignment="Center" Padding="4,0" TextTrimming="CharacterEllipsis" ToolTip="{Binding Notes}" Foreground="{Binding Notes, Converter={StaticResource NotesCharCountColor}}" />
+                                                    <TextBlock Text="{Binding Notes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding Notes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}" MaxLength="1000" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" ToolTip="{Binding Notes}" Foreground="{Binding Notes, Converter={StaticResource NotesCharCountColor}}" />
+                                                    <TextBlock Text="{Binding Notes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding Notes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
 
 
                                 </DataGrid.Columns>
@@ -971,9 +983,10 @@
                                             <TextBox Grid.Column="2" Text="{Binding DevelopmentAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding DevelopmentTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <Border Grid.Column="4" VerticalAlignment="Center" Margin="4,2" ToolTip="Enter notes for this task (max 1,000 characters)" ToolTipService.InitialShowDelay="0">
-                                                <TextBox Text="{Binding DevelopmentNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" />
-                                            </Border>
+                                            <StackPanel Grid.Column="4" Margin="4,2">
+                                                <TextBox Text="{Binding DevelopmentNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" Foreground="{Binding DevelopmentNotes, Converter={StaticResource NotesCharCountColor}}" ToolTip="{Binding DevelopmentNotes}" />
+                                                <TextBlock Text="{Binding DevelopmentNotes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding DevelopmentNotes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
 
@@ -996,9 +1009,10 @@
                                             <TextBox Grid.Column="2" Text="{Binding AnalysisAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding AnalysisTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <Border Grid.Column="4" VerticalAlignment="Center" Margin="4,2" ToolTip="Enter notes for this task (max 1,000 characters)" ToolTipService.InitialShowDelay="0">
-                                                <TextBox Text="{Binding AnalysisNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" />
-                                            </Border>
+                                            <StackPanel Grid.Column="4" Margin="4,2">
+                                                <TextBox Text="{Binding AnalysisNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" Foreground="{Binding AnalysisNotes, Converter={StaticResource NotesCharCountColor}}" ToolTip="{Binding AnalysisNotes}" />
+                                                <TextBlock Text="{Binding AnalysisNotes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding AnalysisNotes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
 
@@ -1021,9 +1035,10 @@
                                             <TextBox Grid.Column="2" Text="{Binding BusinessDesignAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding BusinessDesignTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <Border Grid.Column="4" VerticalAlignment="Center" Margin="4,2" ToolTip="Enter notes for this task (max 1,000 characters)" ToolTipService.InitialShowDelay="0">
-                                                <TextBox Text="{Binding BusinessDesignNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" />
-                                            </Border>
+                                            <StackPanel Grid.Column="4" Margin="4,2">
+                                                <TextBox Text="{Binding BusinessDesignNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" Foreground="{Binding BusinessDesignNotes, Converter={StaticResource NotesCharCountColor}}" ToolTip="{Binding BusinessDesignNotes}" />
+                                                <TextBlock Text="{Binding BusinessDesignNotes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding BusinessDesignNotes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
 
@@ -1046,9 +1061,10 @@
                                             <TextBox Grid.Column="2" Text="{Binding SystemTestingAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding SystemTestingTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <Border Grid.Column="4" VerticalAlignment="Center" Margin="4,2" ToolTip="Enter notes for this task (max 1,000 characters)" ToolTipService.InitialShowDelay="0">
-                                                <TextBox Text="{Binding SystemTestingNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" />
-                                            </Border>
+                                            <StackPanel Grid.Column="4" Margin="4,2">
+                                                <TextBox Text="{Binding SystemTestingNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" Foreground="{Binding SystemTestingNotes, Converter={StaticResource NotesCharCountColor}}" ToolTip="{Binding SystemTestingNotes}" />
+                                                <TextBlock Text="{Binding SystemTestingNotes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding SystemTestingNotes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
 
@@ -1071,9 +1087,10 @@
                                             <TextBox Grid.Column="2" Text="{Binding PromotionAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding PromotionTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <Border Grid.Column="4" VerticalAlignment="Center" Margin="4,2" ToolTip="Enter notes for this task (max 1,000 characters)" ToolTipService.InitialShowDelay="0">
-                                                <TextBox Text="{Binding PromotionNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" />
-                                            </Border>
+                                            <StackPanel Grid.Column="4" Margin="4,2">
+                                                <TextBox Text="{Binding PromotionNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" Foreground="{Binding PromotionNotes, Converter={StaticResource NotesCharCountColor}}" ToolTip="{Binding PromotionNotes}" />
+                                                <TextBlock Text="{Binding PromotionNotes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding PromotionNotes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
 
@@ -1096,9 +1113,10 @@
                                             <TextBox Grid.Column="2" Text="{Binding BaSystemDocAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding BaSystemDocTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <Border Grid.Column="4" VerticalAlignment="Center" Margin="4,2" ToolTip="Enter notes for this task (max 1,000 characters)" ToolTipService.InitialShowDelay="0">
-                                                <TextBox Text="{Binding BaSystemDocNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" />
-                                            </Border>
+                                            <StackPanel Grid.Column="4" Margin="4,2">
+                                                <TextBox Text="{Binding BaSystemDocNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" Foreground="{Binding BaSystemDocNotes, Converter={StaticResource NotesCharCountColor}}" ToolTip="{Binding BaSystemDocNotes}" />
+                                                <TextBlock Text="{Binding BaSystemDocNotes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding BaSystemDocNotes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
 
@@ -1121,9 +1139,10 @@
                                             <TextBox Grid.Column="2" Text="{Binding ProductionValidationAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding ProductionValidationTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <Border Grid.Column="4" VerticalAlignment="Center" Margin="4,2" ToolTip="Enter notes for this task (max 1,000 characters)" ToolTipService.InitialShowDelay="0">
-                                                <TextBox Text="{Binding ProductionValidationNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" />
-                                            </Border>
+                                            <StackPanel Grid.Column="4" Margin="4,2">
+                                                <TextBox Text="{Binding ProductionValidationNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" Foreground="{Binding ProductionValidationNotes, Converter={StaticResource NotesCharCountColor}}" ToolTip="{Binding ProductionValidationNotes}" />
+                                                <TextBlock Text="{Binding ProductionValidationNotes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding ProductionValidationNotes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
 
@@ -1146,9 +1165,10 @@
                                             <TextBox Grid.Column="2" Text="{Binding ProjectManagementAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}" 
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding ProjectManagementTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <Border Grid.Column="4" VerticalAlignment="Center" Margin="4,2" ToolTip="Enter notes for this task (max 1,000 characters)" ToolTipService.InitialShowDelay="0">
-                                                <TextBox Text="{Binding ProjectManagementNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" />
-                                            </Border>
+                                            <StackPanel Grid.Column="4" Margin="4,2">
+                                                <TextBox Text="{Binding ProjectManagementNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" Foreground="{Binding ProjectManagementNotes, Converter={StaticResource NotesCharCountColor}}" ToolTip="{Binding ProjectManagementNotes}" />
+                                                <TextBlock Text="{Binding ProjectManagementNotes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding ProjectManagementNotes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
 
@@ -1171,9 +1191,10 @@
                                             <TextBox Grid.Column="2" Text="{Binding WprsAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}"
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding WprsTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <Border Grid.Column="4" VerticalAlignment="Center" Margin="4,2" ToolTip="Enter notes for this task (max 1,000 characters)" ToolTipService.InitialShowDelay="0">
-                                                <TextBox Text="{Binding WprsNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" />
-                                            </Border>
+                                            <StackPanel Grid.Column="4" Margin="4,2">
+                                                <TextBox Text="{Binding WprsNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" Foreground="{Binding WprsNotes, Converter={StaticResource NotesCharCountColor}}" ToolTip="{Binding WprsNotes}" />
+                                                <TextBlock Text="{Binding WprsNotes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding WprsNotes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
 
@@ -1196,9 +1217,10 @@
                                             <TextBox Grid.Column="2" Text="{Binding ClientMeetingsAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}"
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding ClientMeetingsTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <Border Grid.Column="4" VerticalAlignment="Center" Margin="4,2" ToolTip="Enter notes for this task (max 1,000 characters)" ToolTipService.InitialShowDelay="0">
-                                                <TextBox Text="{Binding ClientMeetingsNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" />
-                                            </Border>
+                                            <StackPanel Grid.Column="4" Margin="4,2">
+                                                <TextBox Text="{Binding ClientMeetingsNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" Foreground="{Binding ClientMeetingsNotes, Converter={StaticResource NotesCharCountColor}}" ToolTip="{Binding ClientMeetingsNotes}" />
+                                                <TextBlock Text="{Binding ClientMeetingsNotes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding ClientMeetingsNotes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
 
@@ -1221,9 +1243,10 @@
                                             <TextBox Grid.Column="2" Text="{Binding InternalMeetingsAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}"
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding InternalMeetingsTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <Border Grid.Column="4" VerticalAlignment="Center" Margin="4,2" ToolTip="Enter notes for this task (max 1,000 characters)" ToolTipService.InitialShowDelay="0">
-                                                <TextBox Text="{Binding InternalMeetingsNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" />
-                                            </Border>
+                                            <StackPanel Grid.Column="4" Margin="4,2">
+                                                <TextBox Text="{Binding InternalMeetingsNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" Foreground="{Binding InternalMeetingsNotes, Converter={StaticResource NotesCharCountColor}}" ToolTip="{Binding InternalMeetingsNotes}" />
+                                                <TextBlock Text="{Binding InternalMeetingsNotes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding InternalMeetingsNotes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
 
@@ -1246,9 +1269,10 @@
                                             <TextBox Grid.Column="2" Text="{Binding AutomationTestCollabAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}"
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding AutomationTestCollabTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <Border Grid.Column="4" VerticalAlignment="Center" Margin="4,2" ToolTip="Enter notes for this task (max 1,000 characters)" ToolTipService.InitialShowDelay="0">
-                                                <TextBox Text="{Binding AutomationTestCollabNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" />
-                                            </Border>
+                                            <StackPanel Grid.Column="4" Margin="4,2">
+                                                <TextBox Text="{Binding AutomationTestCollabNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" Foreground="{Binding AutomationTestCollabNotes, Converter={StaticResource NotesCharCountColor}}" ToolTip="{Binding AutomationTestCollabNotes}" />
+                                                <TextBlock Text="{Binding AutomationTestCollabNotes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding AutomationTestCollabNotes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
 
@@ -1271,9 +1295,10 @@
                                             <TextBox Grid.Column="2" Text="{Binding ConsultantMentorAdjustedHours, Converter={StaticResource AdjustedHours}, UpdateSourceTrigger=LostFocus}"
                                                      Style="{StaticResource NumericTextBox}" Margin="4,2" />
                                             <TextBlock Grid.Column="3" Text="{Binding ConsultantMentorTotalHours, StringFormat=N2}" FontSize="12" FontWeight="SemiBold" Foreground="#1A1A2E" Padding="8,4" TextAlignment="Right" VerticalAlignment="Center" />
-                                            <Border Grid.Column="4" VerticalAlignment="Center" Margin="4,2" ToolTip="Enter notes for this task (max 1,000 characters)" ToolTipService.InitialShowDelay="0">
-                                                <TextBox Text="{Binding ConsultantMentorNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" />
-                                            </Border>
+                                            <StackPanel Grid.Column="4" Margin="4,2">
+                                                <TextBox Text="{Binding ConsultantMentorNotes, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" FontSize="11" BorderBrush="#D1D5DB" BorderThickness="1" MaxLength="1000" Foreground="{Binding ConsultantMentorNotes, Converter={StaticResource NotesCharCountColor}}" ToolTip="{Binding ConsultantMentorNotes}" />
+                                                <TextBlock Text="{Binding ConsultantMentorNotes, Converter={StaticResource NotesCharCount}}" FontSize="9" Foreground="{Binding ConsultantMentorNotes, Converter={StaticResource NotesCharCountColor}}" HorizontalAlignment="Right" />
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
 
@@ -1390,10 +1415,17 @@
                                         <TextBlock Style="{StaticResource HelpIcon}"
                                                    ToolTip="General notes and overall comments for this estimate. Use this to document assumptions, risks, or context not captured in the row-level notes above." />
                                     </StackPanel>
-                                    <TextBox Text="{Binding AdjustedHoursComments, UpdateSourceTrigger=PropertyChanged}" 
-                                             Padding="8,6" FontSize="12" AcceptsReturn="True" TextWrapping="Wrap" 
-                                             Height="100" VerticalScrollBarVisibility="Auto"
-                                             ToolTip="General notes for this estimate" />
+                                    <StackPanel>
+                                        <TextBox Text="{Binding AdjustedHoursComments, UpdateSourceTrigger=PropertyChanged}" 
+                                                 Padding="8,6" FontSize="12" AcceptsReturn="True" TextWrapping="Wrap" 
+                                                 Height="100" VerticalScrollBarVisibility="Auto"
+                                                 MaxLength="4000"
+                                                 ToolTip="{Binding AdjustedHoursComments}"
+                                                 Foreground="{Binding AdjustedHoursComments, Converter={StaticResource NotesCharCountColor}, ConverterParameter=4000}" />
+                                        <TextBlock Text="{Binding AdjustedHoursComments, Converter={StaticResource NotesCharCount}, ConverterParameter=4000}"
+                                                   FontSize="9" HorizontalAlignment="Right"
+                                                   Foreground="{Binding AdjustedHoursComments, Converter={StaticResource NotesCharCountColor}, ConverterParameter=4000}" />
+                                    </StackPanel>
                                 </StackPanel>
                             </Border>
 

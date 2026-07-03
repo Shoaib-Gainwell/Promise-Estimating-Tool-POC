@@ -132,3 +132,34 @@ public class EnumDisplayConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
+
+/// <summary>Converts a notes string to "N/1000" or a limit-warning message.</summary>
+public class NotesCharCountConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        int max = parameter is string p && int.TryParse(p, out int parsed) ? parsed : 1000;
+        int len = value is string s ? s.Length : 0;
+        return len >= max
+            ? $"⚠ Character limit reached — cannot exceed {max} characters"
+            : $"{len}/{max}";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}
+
+/// <summary>Returns Red when notes string is at the limit (from ConverterParameter, default 1000), otherwise Gray.</summary>
+public class NotesCharCountColorConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        int max = parameter is string p && int.TryParse(p, out int parsed) ? parsed : 1000;
+        return (value is string s && s.Length >= max)
+            ? System.Windows.Media.Brushes.Red
+            : System.Windows.Media.Brushes.Gray;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}
