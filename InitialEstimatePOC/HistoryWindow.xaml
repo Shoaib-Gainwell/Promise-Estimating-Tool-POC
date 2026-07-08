@@ -15,8 +15,8 @@
         <Border Grid.Row="0" Padding="16,12">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                    <GradientStop Color="#00857C" Offset="0" />
-                    <GradientStop Color="#006B64" Offset="1" />
+                    <GradientStop Color="#019681" Offset="0" />
+                    <GradientStop Color="#2E307A" Offset="1" />
                 </LinearGradientBrush>
             </Border.Background>
             <TextBlock Text="📋 Project History" FontSize="18" FontWeight="SemiBold" Foreground="White" />
@@ -24,7 +24,7 @@
 
         <!-- Search bar -->
         <Border Grid.Row="1" Margin="16,12,16,0" Padding="8,6"
-                BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="6" Background="White">
+                BorderBrush="#D4D7E0" BorderThickness="1" CornerRadius="6" Background="White">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -41,7 +41,7 @@
                             <Style.Resources>
                                 <VisualBrush x:Key="PlaceholderBrush" Stretch="None" AlignmentX="Left">
                                     <VisualBrush.Visual>
-                                        <TextBlock Text="Search by project name or change order…" Foreground="#9CA3AF" FontSize="13" />
+                                        <TextBlock Text="Search by project name or change order…" Foreground="#8E99A8" FontSize="13" />
                                     </VisualBrush.Visual>
                                 </VisualBrush>
                             </Style.Resources>
@@ -57,7 +57,7 @@
                     </TextBox.Style>
                 </TextBox>
                 <Button x:Name="ClearSearchButton" Grid.Column="2" Content="✕"
-                        FontSize="11" Foreground="#9CA3AF" Background="Transparent" BorderThickness="0"
+                        FontSize="11" Foreground="#8E99A8" Background="Transparent" BorderThickness="0"
                         Cursor="Hand" Visibility="Collapsed" Padding="4,0"
                         Click="OnClearSearchClick" ToolTip="Clear search" />
             </Grid>
@@ -71,20 +71,20 @@
                   SelectionMode="Single"
                   MouseDoubleClick="OnProjectDoubleClick"
                   GridLinesVisibility="Horizontal"
-                  HorizontalGridLinesBrush="#E5E7EB"
+                  HorizontalGridLinesBrush="#E8EAF0"
                   RowHeight="36"
                   HeadersVisibility="Column"
                   BorderThickness="1"
-                  BorderBrush="#E5E7EB">
+                  BorderBrush="#E8EAF0">
 
             <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader">
-                    <Setter Property="Background" Value="#F9FAFB" />
-                    <Setter Property="Foreground" Value="#374151" />
+                    <Setter Property="Background" Value="#EBEDF5" />
+                    <Setter Property="Foreground" Value="#5A6978" />
                     <Setter Property="FontWeight" Value="SemiBold" />
                     <Setter Property="FontSize" Value="12" />
                     <Setter Property="Padding" Value="8,6" />
-                    <Setter Property="BorderBrush" Value="#E5E7EB" />
+                    <Setter Property="BorderBrush" Value="#E8EAF0" />
                     <Setter Property="BorderThickness" Value="0,0,0,1" />
                 </Style>
             </DataGrid.ColumnHeaderStyle>
@@ -94,10 +94,10 @@
                     <Setter Property="Cursor" Value="Hand" />
                     <Style.Triggers>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="#E8F5F3" />
+                            <Setter Property="Background" Value="#E6F5F2" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#F0FDF9" />
+                            <Setter Property="Background" Value="#E6F5F2" />
                         </Trigger>
                     </Style.Triggers>
                 </Style>
@@ -117,33 +117,33 @@
         <!-- Footer buttons -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="16,0,16,12">
             <Button Content="Load Selected" Padding="16,8" FontSize="13" FontWeight="SemiBold"
-                    Background="#00857C" Foreground="White" BorderThickness="0" Cursor="Hand"
+                    Background="#019681" Foreground="White" BorderThickness="0" Cursor="Hand"
                     Click="OnLoadClick" Margin="0,0,8,0">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="#00857C" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                        <Border Background="#019681" CornerRadius="6" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                     </ControlTemplate>
                 </Button.Template>
             </Button>
             <Button Content="Delete" Padding="16,8" FontSize="13" FontWeight="SemiBold"
-                    Foreground="#EF4444" Background="White" BorderThickness="1" BorderBrush="#EF4444" Cursor="Hand"
+                    Foreground="#CC1AC7" Background="White" BorderThickness="1" BorderBrush="#CC1AC7" Cursor="Hand"
                     Click="OnDeleteClick" Margin="0,0,8,0">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="White" CornerRadius="6" BorderThickness="1" BorderBrush="#EF4444" Padding="{TemplateBinding Padding}">
+                        <Border Background="White" CornerRadius="6" BorderThickness="1" BorderBrush="#CC1AC7" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                     </ControlTemplate>
                 </Button.Template>
             </Button>
             <Button Content="Cancel" Padding="16,8" FontSize="13"
-                    Background="#F3F4F6" Foreground="#374151" BorderThickness="0" Cursor="Hand"
+                    Background="#EBEDF5" Foreground="#5A6978" BorderThickness="0" Cursor="Hand"
                     Click="OnCancelClick">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="#F3F4F6" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                        <Border Background="#EBEDF5" CornerRadius="6" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                     </ControlTemplate>
