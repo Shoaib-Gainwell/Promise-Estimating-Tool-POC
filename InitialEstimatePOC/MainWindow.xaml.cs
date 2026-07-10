@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -16,6 +17,11 @@ public partial class MainWindow : Window
     private readonly Stack<UndoAction> _undoStack = new();
     private bool _sidebarVisible = true;
     private bool _suppressUndo; // prevents undo recording during undo/redo operations
+
+    // Pending delete confirmation state
+    private ComponentRowViewModel? _pendingDeleteComponent;
+    private CollaborationRowViewModel? _pendingDeleteCollaboration;
+    private int _pendingDeleteCollabIndex;
 
     public MainWindow()
     {
@@ -256,16 +262,18 @@ public partial class MainWindow : Window
         // Context-aware: delete from whichever grid is active
         if (MainTabControl.SelectedIndex == 1 && CollaborationGrid.CurrentItem is CollaborationRowViewModel collabItem)
         {
-            int index = vm.CollaborationItems.IndexOf(collabItem);
-            _undoStack.Push(new UndoAction(UndoType.CollaborationDelete, null, collabItem, InsertIndex: index));
-            vm.RemoveCollaborationItemCommand.Execute(collabItem);
-            ShowToast("Item removed (Ctrl+Z to undo)", false);
+            _pendingDeleteComponent = null;
+            _pendingDeleteCollaboration = collabItem;
+            _pendingDeleteCollabIndex = vm.CollaborationItems.IndexOf(collabItem);
+            DeleteConfirmMessage.Text = "Are you sure you want to delete this collaboration item? You can undo with Ctrl+Z.";
+            DeleteConfirmOverlay.Visibility = Visibility.Visible;
         }
         else if (ComponentsGrid.CurrentItem is ComponentRowViewModel component)
         {
-            PushUndoComponent(component);
-            vm.RemoveComponentCommand.Execute(component);
-            ShowToast("Component removed (Ctrl+Z to undo)", false);
+            _pendingDeleteCollaboration = null;
+            _pendingDeleteComponent = component;
+            DeleteConfirmMessage.Text = "Are you sure you want to delete this component? You can undo with Ctrl+Z.";
+            DeleteConfirmOverlay.Visibility = Visibility.Visible;
         }
     }
 
@@ -351,11 +359,12 @@ public partial class MainWindow : Window
         ConfirmOverlay.Visibility = Visibility.Collapsed;
         if (DataContext is MainViewModel vm)
         {
-            // Push all components and collab items to undo
-            foreach (var c in vm.Components.ToList())
-                _undoStack.Push(new UndoAction(UndoType.ComponentDelete, c, null));
-            foreach (var c in vm.CollaborationItems.ToList())
-                _undoStack.Push(new UndoAction(UndoType.CollaborationDelete, null, c));
+            // Push a single atomic undo for the entire clear operation
+            var savedComponents = vm.Components.ToList();
+            var savedCollabs = vm.CollaborationItems.ToList();
+            _undoStack.Push(new UndoAction(UndoType.ClearAll, null, null,
+                ClearedComponents: savedComponents,
+                ClearedCollaborations: savedCollabs));
 
             vm.ClearAllCommand.Execute(null);
             ShowToast("All items cleared (Ctrl+Z to undo)", false);
@@ -373,12 +382,10 @@ public partial class MainWindow : Window
     {
         if (sender is Button btn && btn.DataContext is ComponentRowViewModel component)
         {
-            if (DataContext is MainViewModel vm)
-            {
-                PushUndoComponent(component);
-                vm.RemoveComponentCommand.Execute(component);
-                ShowToast("Component removed (Ctrl+Z to undo)", false);
-            }
+            _pendingDeleteCollaboration = null;
+            _pendingDeleteComponent = component;
+            DeleteConfirmMessage.Text = "Are you sure you want to delete this component? You can undo with Ctrl+Z.";
+            DeleteConfirmOverlay.Visibility = Visibility.Visible;
         }
     }
 
@@ -388,12 +395,41 @@ public partial class MainWindow : Window
         {
             if (DataContext is MainViewModel vm)
             {
-                int index = vm.CollaborationItems.IndexOf(item);
-                _undoStack.Push(new UndoAction(UndoType.CollaborationDelete, null, item, InsertIndex: index));
-                vm.RemoveCollaborationItemCommand.Execute(item);
-                ShowToast("Item removed (Ctrl+Z to undo)", false);
+                _pendingDeleteComponent = null;
+                _pendingDeleteCollaboration = item;
+                _pendingDeleteCollabIndex = vm.CollaborationItems.IndexOf(item);
+                DeleteConfirmMessage.Text = "Are you sure you want to delete this collaboration item? You can undo with Ctrl+Z.";
+                DeleteConfirmOverlay.Visibility = Visibility.Visible;
             }
         }
+    }
+
+    private void OnConfirmDeleteYes(object sender, RoutedEventArgs e)
+    {
+        DeleteConfirmOverlay.Visibility = Visibility.Collapsed;
+        if (DataContext is not MainViewModel vm) return;
+
+        if (_pendingDeleteComponent != null)
+        {
+            PushUndoComponent(_pendingDeleteComponent);
+            vm.RemoveComponentCommand.Execute(_pendingDeleteComponent);
+            ShowToast("Component removed (Ctrl+Z to undo)", false);
+            _pendingDeleteComponent = null;
+        }
+        else if (_pendingDeleteCollaboration != null)
+        {
+            _undoStack.Push(new UndoAction(UndoType.CollaborationDelete, null, _pendingDeleteCollaboration, InsertIndex: _pendingDeleteCollabIndex));
+            vm.RemoveCollaborationItemCommand.Execute(_pendingDeleteCollaboration);
+            ShowToast("Item removed (Ctrl+Z to undo)", false);
+            _pendingDeleteCollaboration = null;
+        }
+    }
+
+    private void OnConfirmDeleteNo(object sender, RoutedEventArgs e)
+    {
+        DeleteConfirmOverlay.Visibility = Visibility.Collapsed;
+        _pendingDeleteComponent = null;
+        _pendingDeleteCollaboration = null;
     }
 
     // ═══════════ UNDO ═══════════
@@ -423,11 +459,15 @@ public partial class MainWindow : Window
                         ? action.InsertIndex : vm.Components.Count;
                     vm.Components.Insert(idx, action.Component);
                     action.Component.UpdateBaseHours();
+                    for (int i = 0; i < vm.Components.Count; i++)
+                        vm.Components[i].LineNumber = i + 1;
                     ShowToast("Undo: component restored", false);
                     break;
 
                 case UndoType.ComponentAdd when action.Component != null:
                     vm.Components.Remove(action.Component);
+                    for (int i = 0; i < vm.Components.Count; i++)
+                        vm.Components[i].LineNumber = i + 1;
                     ShowToast("Undo: component add reverted", false);
                     break;
 
@@ -440,17 +480,35 @@ public partial class MainWindow : Window
                     var cIdx = action.InsertIndex >= 0 && action.InsertIndex <= vm.CollaborationItems.Count
                         ? action.InsertIndex : vm.CollaborationItems.Count;
                     vm.CollaborationItems.Insert(cIdx, action.CollaborationItem);
+                    for (int i = 0; i < vm.CollaborationItems.Count; i++)
+                        vm.CollaborationItems[i].LineNumber = i + 1;
                     ShowToast("Undo: item restored", false);
                     break;
 
                 case UndoType.CollaborationAdd when action.CollaborationItem != null:
                     vm.CollaborationItems.Remove(action.CollaborationItem);
+                    for (int i = 0; i < vm.CollaborationItems.Count; i++)
+                        vm.CollaborationItems[i].LineNumber = i + 1;
                     ShowToast("Undo: collaboration add reverted", false);
                     break;
 
                 case UndoType.CollaborationPropertyChange when action.CollaborationItem != null && action.PropertyName != null:
                     SetCollaborationProperty(action.CollaborationItem, action.PropertyName, action.OldValue);
                     ShowToast("Undo: change reverted", false);
+                    break;
+
+                case UndoType.ClearAll:
+                    if (action.ClearedComponents != null)
+                        foreach (var c in action.ClearedComponents)
+                            vm.Components.Add(c);
+                    if (action.ClearedCollaborations != null)
+                        foreach (var c in action.ClearedCollaborations)
+                            vm.CollaborationItems.Add(c);
+                    for (int i = 0; i < vm.Components.Count; i++)
+                        vm.Components[i].LineNumber = i + 1;
+                    for (int i = 0; i < vm.CollaborationItems.Count; i++)
+                        vm.CollaborationItems[i].LineNumber = i + 1;
+                    ShowToast("Undo: all items restored", false);
                     break;
             }
         }
@@ -544,24 +602,36 @@ public partial class MainWindow : Window
         var combo = FindVisualChild<ComboBox>(e.EditingElement);
         if (combo == null) return;
 
-        // When Tab is pressed while the dropdown is open, close the dropdown and let Tab commit+move
-        // When Enter is pressed, treat it like Tab — commit the cell and move to the next editable column
+        // Prevent duplicate handler attachment using Tag as a sentinel
+        if (combo.Tag is "handled") return;
+        combo.Tag = "handled";
+
+        // Focus the text box inside the editable ComboBox so user can type immediately
+        combo.Loaded += (s, _) =>
+        {
+            var textBox = FindVisualChild<TextBox>(combo);
+            if (textBox != null)
+            {
+                textBox.Focus();
+                textBox.SelectAll();
+            }
+        };
+
+        // When Tab is pressed, commit and move to the next editable column
+        // When Enter is pressed, same behavior — commit and move to next column
         combo.PreviewKeyDown += (s, args) =>
         {
-            if (args.Key == Key.Tab && combo.IsDropDownOpen)
+            if (args.Key == Key.Tab)
             {
-                combo.IsDropDownOpen = false;
-                // Do not mark Handled — let Tab propagate to DataGrid for normal navigation
+                if (combo.IsDropDownOpen)
+                    combo.IsDropDownOpen = false;
             }
             else if (args.Key == Key.Enter)
             {
                 if (combo.IsDropDownOpen)
                     combo.IsDropDownOpen = false;
 
-                // Prevent the DataGrid's default Enter behavior (move to next row)
                 args.Handled = true;
-
-                // Capture current cell info before committing
                 var currentCell = CollaborationGrid.CurrentCell;
 
                 Dispatcher.BeginInvoke(DispatcherPriority.Input, () =>
@@ -570,7 +640,6 @@ public partial class MainWindow : Window
 
                     if (!currentCell.IsValid) return;
 
-                    // Find the next editable column after the current one
                     int currentColIdx = CollaborationGrid.Columns.IndexOf(currentCell.Column);
                     for (int i = currentColIdx + 1; i < CollaborationGrid.Columns.Count; i++)
                     {
@@ -696,6 +765,14 @@ public partial class MainWindow : Window
         var originalSource = e.OriginalSource as DependencyObject;
         if (originalSource == null) return;
 
+        // Don't intercept clicks on buttons (e.g., delete button in the row)
+        var check = originalSource;
+        while (check != null && check is not DataGridCell)
+        {
+            if (check is Button) return;
+            check = VisualTreeHelper.GetParent(check);
+        }
+
         DataGridCell? cell = null;
         var current = originalSource;
         while (current != null && current is not DataGrid)
@@ -718,11 +795,41 @@ public partial class MainWindow : Window
         if (!cell.IsEditing)
             grid.BeginEdit(e);
     }
+
+    private void Window_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        var source = e.OriginalSource as DependencyObject;
+        if (source == null) return;
+
+        // Walk up the tree to see what was clicked
+        var current = source;
+        while (current != null)
+        {
+            if (current is DataGridCell) return; // Clicked a cell — don't interfere
+            if (current is DataGridColumnHeader) return;
+            if (current is Button) return;
+            if (current is ComboBox) return;
+            if (current is ComboBoxItem) return;
+            if (current is Popup) return;
+            current = VisualTreeHelper.GetParent(current);
+        }
+
+        // Click was outside any cell/control — deselect and exit edit mode
+        if (ComponentsGrid.IsKeyboardFocusWithin || CollaborationGrid.IsKeyboardFocusWithin)
+        {
+            ComponentsGrid.CommitEdit(DataGridEditingUnit.Row, exitEditingMode: true);
+            ComponentsGrid.UnselectAllCells();
+            CollaborationGrid.CommitEdit(DataGridEditingUnit.Row, exitEditingMode: true);
+            CollaborationGrid.UnselectAllCells();
+            Keyboard.ClearFocus();
+            Focus();
+        }
+    }
 }
 
 // ═══════════ UNDO TYPES ═══════════
 
-public enum UndoType { ComponentDelete, ComponentAdd, ComponentPropertyChange, CollaborationDelete, CollaborationAdd, CollaborationPropertyChange }
+public enum UndoType { ComponentDelete, ComponentAdd, ComponentPropertyChange, CollaborationDelete, CollaborationAdd, CollaborationPropertyChange, ClearAll }
 
 public record UndoAction(
     UndoType Type,
@@ -730,4 +837,6 @@ public record UndoAction(
     CollaborationRowViewModel? CollaborationItem,
     string? PropertyName = null,
     object? OldValue = null,
-    int InsertIndex = -1);
+    int InsertIndex = -1,
+    List<ComponentRowViewModel>? ClearedComponents = null,
+    List<CollaborationRowViewModel>? ClearedCollaborations = null);

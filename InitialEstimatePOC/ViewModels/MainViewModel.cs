@@ -293,9 +293,9 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<ComponentRowViewModel> Components { get; } = new();
     public ObservableCollection<CollaborationRowViewModel> CollaborationItems { get; } = new();
 
-    public Array ComponentTypes => Enum.GetValues<ComponentType>();
-    public Array ChangeTypes => Enum.GetValues<ChangeType>();
-    public Array Sizes => Enum.GetValues<ComponentSize>();
+    public ComponentType[] ComponentTypes => Enum.GetValues<ComponentType>().OrderBy(v => v == ComponentType.None ? 0 : 1).ToArray();
+    public ChangeType[] ChangeTypes => Enum.GetValues<ChangeType>().OrderBy(v => v == ChangeType.None ? 0 : 1).ToArray();
+    public ComponentSize[] Sizes => Enum.GetValues<ComponentSize>().OrderBy(v => v == ComponentSize.None ? 0 : 1).ToArray();
     public Array CollaborationTypes => Enum.GetValues<CollaborationType>();
 
     /// <summary>PM Effort % dropdown options matching Excel J34: 1–20</summary>
@@ -567,7 +567,10 @@ public partial class MainViewModel : ObservableObject
             dev += c.TotalHours;
 
         TotalDevelopmentHours = dev;
-        ComponentCount = Components.Count;
+        ComponentCount = Components.Count(c => c.ComponentType != ComponentType.None 
+            && c.ChangeType != ChangeType.None 
+            && c.Size != ComponentSize.None 
+            && c.Count > 0);
         CollaborationCount = CollaborationItems.Count;
 
         // All adjustments cascade: each task uses effective (calculated + adjusted) values

@@ -290,12 +290,26 @@ public class ViewModelEdgeCaseTests
         var vm = new MainViewModel();
         Assert.Equal(0, vm.ComponentCount);
 
+        // Adding an empty component should NOT increment the count
         vm.AddComponentCommand.Execute(null);
+        Assert.Equal(0, vm.ComponentCount);
+
+        // Fill in required fields — now it should count
+        vm.Components[0].ComponentType = ComponentType.MISC;
+        vm.Components[0].ChangeType = ChangeType.New;
+        vm.Components[0].Size = ComponentSize.Small;
+        vm.Components[0].Count = 1;
         Assert.Equal(1, vm.ComponentCount);
 
+        // Add another complete component
         vm.AddComponentCommand.Execute(null);
+        vm.Components[1].ComponentType = ComponentType.Reports;
+        vm.Components[1].ChangeType = ChangeType.Change;
+        vm.Components[1].Size = ComponentSize.Medium;
+        vm.Components[1].Count = 2;
         Assert.Equal(2, vm.ComponentCount);
 
+        // Remove one — count should drop
         vm.RemoveComponentCommand.Execute(vm.Components[0]);
         Assert.Equal(1, vm.ComponentCount);
     }
