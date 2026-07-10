@@ -32,3 +32,6 @@ llm-bridge/
 .for_my_referance/
 
 publish/
+
+# WPF temp project files
+*_wpftmp.csproj
